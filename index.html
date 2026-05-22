@@ -4,509 +4,574 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Для Манюні ❤️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(20, 20, 25, 0.4);
-            --border: rgba(255, 255, 255, 0.15);
+            --glass: rgba(20, 15, 25, 0.55);
+            --border: rgba(255, 100, 150, 0.25);
+            --neon: #ff2a5f;
         }
 
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
         body {
             margin: 0; padding: 0; height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at 70% 30%, #36173d, #14081c, #000000);
+            background: radial-gradient(circle at 50% 30%, #2b0b16, #0d040b, #000000);
             font-family: 'Montserrat', sans-serif;
-            color: white; overflow: hidden;
-            user-select: none; -webkit-user-select: none;
+            color: white; overflow: hidden; touch-action: none;
         }
 
-        /* Стартовий екран-термінал */
-        .cli-container {
-            background: rgba(10, 10, 15, 0.85);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border);
-            border-radius: 24px; padding: 35px;
-            width: 85vw; max-width: 450px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
-        }
-
-        .cli-text {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.5rem; color: #ff758c;
-            min-height: 60px; line-height: 1.5;
-            margin-bottom: 30px;
-        }
-
-        .cursor { animation: blink 0.8s infinite; color: white; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .btn-glow {
-            background: linear-gradient(135deg, #ff4d6d, #c9184a);
-            color: white; border: none;
-            padding: 18px 32px; border-radius: 16px;
-            font-size: 1.1rem; font-weight: 800; width: 100%;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(255,77,109,0.4);
-            animation: pulseGlow 2s infinite; transition: transform 0.2s;
-        }
-        .btn-glow:active { transform: scale(0.95); }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 10px 25px rgba(255,77,109,0.4); }
-            50% { box-shadow: 0 10px 40px rgba(255,77,109,0.7); }
-            100% { box-shadow: 0 10px 25px rgba(255,77,109,0.4); }
-        }
-
-        /* Ігровий інтерфейс */
-        #game-layout {
-            display: none; flex-direction: column; align-items: center;
-            transform: translateY(-20px);
-        }
-
-        .stats-panel {
-            display: flex; justify-content: space-between; width: 340px;
+        /* Головне меню */
+        #main-menu {
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
             background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 20px;
-            padding: 12px 25px; margin-bottom: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            padding: 40px; border-radius: 30px; border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(255,42,95,0.15), inset 0 0 30px rgba(255,255,255,0.05);
+            text-align: center; z-index: 10;
         }
+        h1 { margin: 0 0 10px 0; font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--neon); }
+        p.subtitle { margin: 0 0 30px 0; font-size: 1rem; color: #ffb3c6; }
 
-        .stat-item { text-align: center; }
-        .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-size: 1.5rem; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(255,255,255,0.3); margin-top: 4px; }
+        .btn {
+            background: linear-gradient(135deg, #ff2a5f, #a0002d);
+            color: white; border: none; padding: 18px 40px; border-radius: 20px;
+            font-size: 1.1rem; font-weight: 700; width: 100%; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255,42,95,0.4);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn:active { transform: scale(0.92); box-shadow: 0 5px 15px rgba(255,42,95,0.6); }
+        .btn.secondary { background: linear-gradient(135deg, #7b2cbf, #3c096c); box-shadow: 0 10px 25px rgba(123,44,191,0.4); }
 
-        /* Поле гри */
-        #game-board {
+        /* Ігрові контейнери */
+        .game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; justify-content: center; position: absolute; inset: 0; }
+        
+        /* UI Панелі */
+        .top-bar {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; justify-content: space-between; align-items: center;
+            width: 360px; z-index: 50;
+        }
+        .back-btn {
+            background: var(--glass); border: 1px solid var(--border);
+            color: white; width: 45px; height: 45px; border-radius: 15px;
+            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(10px);
+        }
+        .score-box {
+            background: var(--glass); border: 1px solid var(--border); border-radius: 15px;
+            padding: 8px 25px; text-align: center; backdrop-filter: blur(10px);
+        }
+        .score-val { font-size: 1.5rem; font-weight: 900; color: #ffb3c6; text-shadow: 0 0 10px rgba(255,179,198,0.5); }
+
+        /* Гра 1: Сердечка */
+        #match3-board {
             position: relative; width: 360px; height: 540px;
-            background: rgba(0, 0, 0, 0.4); border-radius: 24px;
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.6);
-            overflow: hidden; touch-action: none;
-            transition: transform 0.1s;
+            background: rgba(10, 5, 15, 0.6); border-radius: 24px;
+            border: 1px solid rgba(255,100,150,0.15);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 20px 50px rgba(0,0,0,0.8);
+            overflow: hidden; margin-top: 50px;
         }
 
-        /* Візуальна тактильна віддача (трясучка) */
         .shake-board { animation: hardShake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes hardShake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px) rotate(-1deg); }
-            40% { transform: translateX(5px) rotate(1deg); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(2px); }
-        }
+        @keyframes hardShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-1deg); } 75% { transform: translateX(5px) rotate(1deg); } }
 
-        /* 3D Сердечка */
-        .heart-item {
+        .gem {
             position: absolute; width: 45px; height: 45px;
-            background-size: 85% 85%;
-            background-position: center;
-            background-repeat: no-repeat;
-            filter: drop-shadow(0px 8px 5px rgba(0,0,0,0.6));
-            transition: top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                        left 0.25s ease-out, 
-                        transform 0.15s ease, 
-                        opacity 0.25s ease;
-            cursor: pointer;
+            background-size: 85% 85%; background-position: center; background-repeat: no-repeat;
+            filter: drop-shadow(0px 6px 4px rgba(0,0,0,0.5));
+            transition: top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.25s ease-out, transform 0.15s ease;
+            will-change: transform, top, left; cursor: pointer;
         }
-        .heart-item:active { transform: scale(0.85); filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8)); }
+        .gem:active { transform: scale(0.85); filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8)); }
 
-        /* Ефекти ульти */
-        .particle {
-            position: absolute; pointer-events: none;
-            background-size: contain; background-repeat: no-repeat;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            animation: explode 0.8s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+        /* Осколки руйнування */
+        .shard {
+            position: absolute; pointer-events: none; border-radius: 50%;
+            animation: shatter 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            will-change: transform, opacity;
         }
-        @keyframes explode {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(180deg); opacity: 0; }
+        @keyframes shatter {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
         }
 
-        #ult-overlay {
-            position: absolute; inset: 0; background: rgba(255,255,255,0);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; pointer-events: none; transition: background 0.3s;
+        /* Гра 2: Flappy Heart */
+        #flappy-board {
+            position: relative; width: 360px; height: 600px;
+            background: linear-gradient(180deg, #1a0b2e 0%, #3a0ca3 100%);
+            border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.7); margin-top: 40px;
         }
-        #ult-heart {
-            width: 0px; height: 0px;
+        
+        .flappy-bird {
+            position: absolute; width: 40px; height: 40px;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            filter: drop-shadow(0 20px 30px rgba(255,77,109,0.8));
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            left: 50px; top: 250px; z-index: 10;
+            filter: drop-shadow(0 0 15px rgba(255,42,95,0.8));
+            will-change: transform; transition: transform 0.1s;
         }
+
+        .pipe {
+            position: absolute; width: 60px;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L100 0 L80 20 L100 40 L80 60 L100 80 L50 100 L0 80 L20 60 L0 40 L20 20 Z' fill='%232d6a4f'/%3E%3C/svg%3E");
+            background-size: 100% 100px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+            will-change: left;
+        }
+        .pipe.top { transform: scaleY(-1); } /* Перевертаємо верхній шип */
+
+        #flappy-game-over {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #flappy-game-over.active { opacity: 1; pointer-events: all; }
+
     </style>
 </head>
 <body>
 
-    <div id="welcome-panel" class="cli-container">
-        <div id="cli-box" class="cli-text"></div>
-        <button id="btn-action" class="btn-glow" onclick="handleMainAction()">Натисни, щоб посилити магію ❤️</button>
+    <!-- ГОЛОВНЕ МЕНЮ -->
+    <div id="main-menu">
+        <div>
+            <h1>Обери гру ❤️</h1>
+            <p class="subtitle">Спеціально для тебе, манюня</p>
+        </div>
+        <button class="btn" onclick="app.startMatch3()">Кристальні Сердечка</button>
+        <button class="btn secondary" onclick="app.startFlappy()">Політ Кохання</button>
     </div>
 
-    <div id="game-layout">
-        <div class="stats-panel">
-            <div class="stat-item">
-                <div class="stat-label">Очки</div>
-                <div id="score-val" class="stat-value" style="color: #ff758c;">0</div>
+    <!-- ГРА 1: MATCH-3 -->
+    <div id="game1" class="game-screen">
+        <div class="top-bar">
+            <div class="back-btn" onclick="app.showMenu()">❮</div>
+            <div class="score-box">
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ОЧКИ</div>
+                <div id="m3-score" class="score-val">0</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Час</div>
-                <div id="timer-val" class="stat-value">60</div>
-            </div>
+            <div style="width: 45px;"></div>
         </div>
-        <div id="game-board">
-            <div id="ult-overlay"><div id="ult-heart"></div></div>
+        <div id="match3-board"></div>
+    </div>
+
+    <!-- ГРА 2: FLAPPY HEART -->
+    <div id="game2" class="game-screen">
+        <div class="top-bar">
+            <div class="back-btn" onclick="app.showMenu()">❮</div>
+            <div class="score-box">
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ПЕРЕШКОДИ</div>
+                <div id="fl-score" class="score-val">0</div>
+            </div>
+            <div style="width: 45px;"></div>
+        </div>
+        <div id="flappy-board" onmousedown="flappy.jump()" ontouchstart="flappy.jump()">
+            <div id="f-bird" class="flappy-bird"></div>
+            <div id="flappy-game-over">
+                <h2 style="color:#ff2a5f; margin-bottom: 20px;">Ой, шипи! 🌹</h2>
+                <button class="btn" style="width:200px;" onclick="flappy.reset(event)">Спробувати ще</button>
+            </div>
         </div>
     </div>
 
 <script>
-    // --- ГЕНЕРАТОР РЕАЛІСТИЧНИХ 3D СЕРДЕЦЬ (SVG Data URIs) ---
-    // Створює об'ємне скло/льодяник з відблиском світла
-    function create3DHeart(mainColor, darkColor) {
+    // --- ГЕНЕРАТОР 3D СЕРДЕЦЬ ---
+    function createGemSVG(mainColor, darkColor) {
         const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
             <defs>
-                <radialGradient id="grad" cx="30%" cy="25%" r="75%">
-                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
-                    <stop offset="15%" stop-color="${mainColor}"/>
-                    <stop offset="75%" stop-color="${darkColor}"/>
+                <linearGradient id="grad" x1="20%" y1="0%" x2="80%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+                    <stop offset="30%" stop-color="${mainColor}"/>
+                    <stop offset="80%" stop-color="${darkColor}"/>
                     <stop offset="100%" stop-color="#000000" stop-opacity="0.9"/>
-                </radialGradient>
+                </linearGradient>
             </defs>
             <path d="M50 90 C 50 90 10 60 10 30 C 10 10 35 5 50 25 C 65 5 90 10 90 30 C 90 60 50 90 50 90 Z" fill="url(#grad)"/>
-            <path d="M 22 28 C 22 15 35 12 50 22 C 38 18 28 22 22 28 Z" fill="#ffffff" opacity="0.6"/>
+            <path d="M 25 30 C 25 18 35 15 50 24 C 38 18 30 22 25 30 Z" fill="#ffffff" opacity="0.6"/>
         </svg>`;
         return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}")`;
     }
 
-    const gemStyles = {
-        red: create3DHeart('#ff4d6d', '#8a0021'),
-        blue: create3DHeart('#00b4d8', '#003d5c'),
-        purple: create3DHeart('#9d4edd', '#3c096c'),
-        orange: create3DHeart('#ff9e00', '#cc5500'),
-        green: create3DHeart('#52b788', '#1b4332')
+    const gemData = {
+        red: { bg: createGemSVG('#ff2a5f', '#8a0021'), color: '#ff2a5f' },
+        blue: { bg: createGemSVG('#00b4d8', '#003d5c'), color: '#00b4d8' },
+        purple: { bg: createGemSVG('#9d4edd', '#3c096c'), color: '#9d4edd' },
+        yellow: { bg: createGemSVG('#ffb703', '#9c6600'), color: '#ffb703' },
+        green: { bg: createGemSVG('#52b788', '#1b4332'), color: '#52b788' }
     };
-    const colorKeys = Object.keys(gemStyles);
+    const types = Object.keys(gemData);
 
     // --- ТАКТИЛЬНА ВІДДАЧА ---
-    function triggerHaptic(type) {
-        // Вібрація (працює на Android)
-        if (navigator.vibrate) {
-            if (type === 'success') navigator.vibrate(2); // Чіткий мікро-клік
-            if (type === 'fail') navigator.vibrate([15, 40, 15]); // Подвійний удар
-            if (type === 'ult') navigator.vibrate([50, 50, 100, 50, 200]); // Потужна вібрація
-        }
+    function vibrate(type) {
+        if (!navigator.vibrate) return;
+        if (type === 'tap') navigator.vibrate(5);
+        if (type === 'match') navigator.vibrate(15);
+        if (type === 'fail') navigator.vibrate([20, 30, 20]);
+        if (type === 'ult') navigator.vibrate([40, 40, 80, 40, 150]);
+        if (type === 'crash') navigator.vibrate([50, 50, 100]);
+    }
 
-        // Візуальний зворотний зв'язок (працює всюди, ідеально для iPhone)
-        if (type === 'fail') {
-            const board = document.getElementById('game-board');
-            board.classList.remove('shake-board');
-            void board.offsetWidth; // Тригер рефлоу для перезапуску анімації
+    // --- ГЛОБАЛЬНИЙ МЕНЕДЖЕР ---
+    const app = {
+        showMenu: () => {
+            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('game1').style.display = 'none';
+            document.getElementById('game2').style.display = 'none';
+            flappy.stop(); // Зупиняємо цикл Flappy
+        },
+        startMatch3: () => {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game1').style.display = 'flex';
+            match3.init();
+        },
+        startFlappy: () => {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game2').style.display = 'flex';
+            flappy.init();
+        }
+    };
+
+    // ==========================================
+    // ГРА 1: КРИСТАЛЬНІ СЕРДЕЧКА (MATCH-3)
+    // ==========================================
+    const match3 = {
+        board: [], ROWS: 12, COLS: 8, CELL: 45, score: 0, locked: false, dragStart: null,
+        
+        init() {
+            this.board = []; this.score = 0; this.updateScore(0);
+            const container = document.getElementById('match3-board');
+            container.innerHTML = '';
+            for (let r = 0; r < this.ROWS; r++) {
+                this.board[r] = [];
+                for (let c = 0; c < this.COLS; c++) this.spawnGem(r, c, false);
+            }
+            this.cleanInitialMatches();
+            this.render();
+            this.setupControls(container);
+        },
+
+        spawnGem(r, c, isRain) {
+            const type = types[Math.floor(Math.random() * types.length)];
+            const el = document.createElement('div');
+            el.className = 'gem';
+            el.style.backgroundImage = gemData[type].bg;
+            el.style.top = isRain ? `${-Math.random() * 200 - 50}px` : `${r * this.CELL}px`;
+            el.style.left = `${c * this.CELL}px`;
+            document.getElementById('match3-board').appendChild(el);
+            this.board[r][c] = { type, element: el };
+            if (isRain) setTimeout(() => { if(this.board[r][c]) this.board[r][c].element.style.top = `${r * this.CELL}px`; }, 20);
+        },
+
+        render() {
+            for (let r=0; r<this.ROWS; r++) {
+                for (let c=0; c<this.COLS; c++) {
+                    if (this.board[r][c]) {
+                        this.board[r][c].element.style.top = `${r * this.CELL}px`;
+                        this.board[r][c].element.style.left = `${c * this.CELL}px`;
+                    }
+                }
+            }
+        },
+
+        cleanInitialMatches() {
+            let hasMatches = true;
+            while (hasMatches) {
+                hasMatches = false;
+                for (let r=0; r<this.ROWS; r++) {
+                    for (let c=0; c<this.COLS; c++) {
+                        if ((c < this.COLS-2 && this.board[r][c].type === this.board[r][c+1].type && this.board[r][c].type === this.board[r][c+2].type) ||
+                            (r < this.ROWS-2 && this.board[r][c].type === this.board[r+1][c].type && this.board[r][c].type === this.board[r+2][c].type)) {
+                            this.board[r][c].type = types[(types.indexOf(this.board[r][c].type) + 1) % types.length];
+                            this.board[r][c].element.style.backgroundImage = gemData[this.board[r][c].type].bg;
+                            hasMatches = true;
+                        }
+                    }
+                }
+            }
+        },
+
+        setupControls(el) {
+            const getC = (e) => {
+                const rect = el.getBoundingClientRect();
+                const evt = e.touches ? e.touches[0] : e;
+                return { c: Math.floor((evt.clientX - rect.left) / this.CELL), r: Math.floor((evt.clientY - rect.top) / this.CELL) };
+            };
+            const start = (e) => { if(!this.locked) this.dragStart = getC(e); };
+            const move = (e) => {
+                if(!this.dragStart || this.locked) return;
+                const curr = getC(e);
+                if (Math.abs(curr.r - this.dragStart.r) + Math.abs(curr.c - this.dragStart.c) === 1) {
+                    this.swap(this.dragStart, curr);
+                    this.dragStart = null;
+                }
+            };
+            el.onmousedown = start; el.ontouchstart = start;
+            window.onmousemove = move; window.ontouchmove = move;
+            window.onmouseup = () => this.dragStart = null; window.ontouchend = () => this.dragStart = null;
+        },
+
+        async swap(p1, p2) {
+            if (p1.r<0 || p1.r>=this.ROWS || p1.c<0 || p1.c>=this.COLS || p2.r<0 || p2.r>=this.ROWS || p2.c<0 || p2.c>=this.COLS) return;
+            this.locked = true; vibrate('tap');
+            let g1 = this.board[p1.r][p1.c], g2 = this.board[p2.r][p2.c];
+            this.board[p1.r][p1.c] = g2; this.board[p2.r][p2.c] = g1;
+            this.render();
+            await new Promise(r => setTimeout(r, 250));
+
+            if (!await this.checkMatches()) {
+                vibrate('fail');
+                const b = document.getElementById('match3-board');
+                b.classList.remove('shake-board'); void b.offsetWidth; b.classList.add('shake-board');
+                this.board[p1.r][p1.c] = g1; this.board[p2.r][p2.c] = g2;
+                this.render();
+                await new Promise(r => setTimeout(r, 200));
+                this.locked = false;
+            }
+        },
+
+        async checkMatches() {
+            let matched = false;
+            let dGrid = Array(this.ROWS).fill(null).map(() => Array(this.COLS).fill(false));
+
+            for (let r=0; r<this.ROWS; r++) {
+                for (let c=0; c<this.COLS-2; c++) {
+                    if (this.board[r][c] && this.board[r][c+1] && this.board[r][c+2] && 
+                        this.board[r][c].type===this.board[r][c+1].type && this.board[r][c].type===this.board[r][c+2].type) {
+                        dGrid[r][c] = dGrid[r][c+1] = dGrid[r][c+2] = true; matched = true;
+                    }
+                }
+            }
+            for (let c=0; c<this.COLS; c++) {
+                for (let r=0; r<this.ROWS-2; r++) {
+                    if (this.board[r][c] && this.board[r+1][c] && this.board[r+2][c] && 
+                        this.board[r][c].type===this.board[r+1][c].type && this.board[r][c].type===this.board[r+2][c].type) {
+                        dGrid[r][c] = dGrid[r+1][c] = dGrid[r+2][c] = true; matched = true;
+                    }
+                }
+            }
+
+            if (!matched) return false;
+
+            // Шанс на Ульту: 10%
+            let isUlt = Math.random() < 0.10; 
+
+            if (isUlt) {
+                vibrate('ult'); await this.runUlt();
+            } else {
+                vibrate('match'); await this.dissolve(dGrid);
+            }
+            return true;
+        },
+
+        explodeParticles(x, y, color) {
+            const b = document.getElementById('match3-board');
+            for(let i=0; i<5; i++) {
+                let p = document.createElement('div');
+                p.className = 'shard';
+                p.style.width = p.style.height = (Math.random() * 8 + 6) + 'px';
+                p.style.backgroundColor = color;
+                p.style.left = (x + 20) + 'px'; p.style.top = (y + 20) + 'px';
+                p.style.setProperty('--dx', (Math.random() - 0.5) * 80 + 'px');
+                p.style.setProperty('--dy', (Math.random() - 0.5) * 80 + 'px');
+                b.appendChild(p);
+                setTimeout(() => p.remove(), 500);
+            }
+        },
+
+        async dissolve(dGrid) {
+            let count = 0;
+            for (let r=0; r<this.ROWS; r++) {
+                for (let c=0; c<this.COLS; c++) {
+                    if (dGrid[r][c] && this.board[r][c]) {
+                        count++;
+                        let el = this.board[r][c].element;
+                        this.explodeParticles(c*this.CELL, r*this.CELL, gemData[this.board[r][c].type].color);
+                        el.style.transform = `scale(0)`; el.style.opacity = '0';
+                        setTimeout(((target) => () => target.remove())(el), 200);
+                        this.board[r][c] = null;
+                    }
+                }
+            }
+            this.updateScore(count * 10);
+            await new Promise(r => setTimeout(r, 250));
+            await this.applyGravity();
+        },
+
+        async runUlt() {
+            const b = document.getElementById('match3-board');
+            b.classList.add('shake-board');
+            setTimeout(() => b.classList.remove('shake-board'), 300);
+
+            let count = 0;
+            for (let r=0; r<this.ROWS; r++) {
+                for (let c=0; c<this.COLS; c++) {
+                    if (this.board[r][c]) {
+                        count++;
+                        this.explodeParticles(c*this.CELL, r*this.CELL, gemData[this.board[r][c].type].color);
+                        this.board[r][c].element.remove();
+                        this.board[r][c] = null;
+                    }
+                }
+            }
+            this.updateScore(count * 15);
+            await new Promise(r => setTimeout(r, 400));
+            
+            for (let r=0; r<this.ROWS; r++) {
+                for (let c=0; c<this.COLS; c++) this.spawnGem(r, c, true);
+            }
+            await new Promise(r => setTimeout(r, 500));
+            if(!await this.checkMatches()) this.locked = false;
+        },
+
+        async applyGravity() {
+            for (let c=0; c<this.COLS; c++) {
+                let empty = 0;
+                for (let r=this.ROWS-1; r>=0; r--) {
+                    if (!this.board[r][c]) empty++;
+                    else if (empty > 0) {
+                        this.board[r+empty][c] = this.board[r][c];
+                        this.board[r][c] = null;
+                    }
+                }
+                for (let i=0; i<empty; i++) this.spawnGem(i, c, true);
+            }
+            this.render();
+            await new Promise(r => setTimeout(r, 350));
+            if (!await this.checkMatches()) this.locked = false;
+        },
+
+        updateScore(amt) {
+            this.score += amt;
+            const sv = document.getElementById('m3-score');
+            sv.innerText = this.score;
+            sv.style.transform = 'scale(1.3)'; setTimeout(() => sv.style.transform = 'scale(1)', 150);
+        }
+    };
+
+    // ==========================================
+    // ГРА 2: FLAPPY HEART (ПОЛІТ КОХАННЯ)
+    // ==========================================
+    const flappy = {
+        birdY: 250, velocity: 0, gravity: 0.4, jumpStrength: -7,
+        pipes: [], pipeSpeed: 3, frameNum: 0, score: 0, reqId: null, isRunning: false,
+
+        init() {
+            document.getElementById('f-bird').style.backgroundImage = gemData.red.bg;
+            this.reset(null);
+        },
+
+        reset(e) {
+            if(e) e.stopPropagation();
+            this.birdY = 250; this.velocity = 0; this.score = 0;
+            this.pipes.forEach(p => p.topEl.remove() || p.botEl.remove());
+            this.pipes = []; this.frameNum = 0;
+            document.getElementById('flappy-game-over').classList.remove('active');
+            document.getElementById('fl-score').innerText = '0';
+            this.isRunning = true;
+            this.loop();
+        },
+
+        stop() {
+            this.isRunning = false;
+            if(this.reqId) cancelAnimationFrame(this.reqId);
+        },
+
+        jump() {
+            if(!this.isRunning) return;
+            this.velocity = this.jumpStrength;
+            vibrate('tap');
+            document.getElementById('f-bird').style.transform = 'rotate(-15deg) scale(1.1)';
+        },
+
+        spawnPipe() {
+            const gap = 160; 
+            const minHeight = 50;
+            const boardHeight = 600;
+            // Випадкова висота верхнього шипа
+            const topHeight = Math.floor(Math.random() * (boardHeight - gap - minHeight * 2)) + minHeight;
+            const botHeight = boardHeight - topHeight - gap;
+
+            const board = document.getElementById('flappy-board');
+            
+            const topEl = document.createElement('div');
+            topEl.className = 'pipe top';
+            topEl.style.height = topHeight + 'px';
+            topEl.style.left = '360px'; topEl.style.top = '0px';
+
+            const botEl = document.createElement('div');
+            botEl.className = 'pipe';
+            botEl.style.height = botHeight + 'px';
+            botEl.style.left = '360px'; botEl.style.bottom = '0px';
+
+            board.appendChild(topEl); board.appendChild(botEl);
+            this.pipes.push({ x: 360, topEl, botEl, passed: false });
+        },
+
+        loop() {
+            if(!this.isRunning) return;
+
+            // Фізика
+            this.velocity += this.gravity;
+            this.birdY += this.velocity;
+            
+            const birdEl = document.getElementById('f-bird');
+            birdEl.style.top = this.birdY + 'px';
+            
+            // Плавне обертання при падінні
+            if (this.velocity > 2) birdEl.style.transform = `rotate(${Math.min(this.velocity * 3, 45)}deg)`;
+
+            // Створення перешкод (кожні 80 кадрів)
+            if (this.frameNum % 80 === 0) this.spawnPipe();
+
+            // Рух перешкод та зіткнення
+            for (let i = this.pipes.length - 1; i >= 0; i--) {
+                let p = this.pipes[i];
+                p.x -= this.pipeSpeed;
+                p.topEl.style.left = p.x + 'px';
+                p.botEl.style.left = p.x + 'px';
+
+                // Зіткнення (Hitbox пташки: X:50-80, Y:birdY - birdY+30)
+                let birdRect = { l: 55, r: 85, t: this.birdY + 5, b: this.birdY + 35 };
+                let topRect = { l: p.x, r: p.x + 60, b: parseFloat(p.topEl.style.height) };
+                let botRect = { l: p.x, r: p.x + 60, t: 600 - parseFloat(p.botEl.style.height) };
+
+                if (birdRect.r > topRect.l && birdRect.l < topRect.r) {
+                    if (birdRect.t < topRect.b || birdRect.b > botRect.t) {
+                        this.gameOver(); return;
+                    }
+                }
+
+                // Підрахунок очок
+                if (p.x < 50 && !p.passed) {
+                    p.passed = true;
+                    this.score++;
+                    document.getElementById('fl-score').innerText = this.score;
+                }
+
+                // Видалення старих шипів
+                if (p.x < -60) {
+                    p.topEl.remove(); p.botEl.remove();
+                    this.pipes.splice(i, 1);
+                }
+            }
+
+            // Зіткнення з підлогою/стелею
+            if (this.birdY > 560 || this.birdY < -20) {
+                this.gameOver(); return;
+            }
+
+            this.frameNum++;
+            this.reqId = requestAnimationFrame(() => this.loop());
+        },
+
+        gameOver() {
+            this.isRunning = false;
+            vibrate('crash');
+            const board = document.getElementById('flappy-board');
             board.classList.add('shake-board');
+            setTimeout(() => board.classList.remove('shake-board'), 300);
+            document.getElementById('flappy-game-over').classList.add('active');
         }
-    }
+    };
 
-    // --- ДРУК ТЕКСТУ ---
-    const phrase = "Я тебе кохаю манюня";
-    let charIndex = 0;
-    function typeCLI() {
-        const box = document.getElementById('cli-box');
-        if (charIndex < phrase.length) {
-            box.innerHTML = phrase.substring(0, charIndex + 1) + '<span class="cursor">_</span>';
-            charIndex++;
-            setTimeout(typeCLI, 120);
-        } else {
-            box.innerHTML = phrase + '<span class="cursor">_</span>';
-            const btn = document.getElementById('btn-action');
-            btn.innerText = 'Грати в "Сердечка"';
-            btn.style.display = 'block';
-        }
-    }
-
-    function handleMainAction() {
-        const btn = document.getElementById('btn-action');
-        if (btn.innerText.includes("магію")) {
-            btn.style.display = 'none';
-            typeCLI();
-        } else {
-            document.getElementById('welcome-panel').style.display = 'none';
-            document.getElementById('game-layout').style.display = 'flex';
-            setupGame();
-        }
-    }
-
-    // --- ЛОГІКА ГРИ ---
-    const ROWS = 12, COLS = 8, CELL = 45;
-    let board = [], isLocked = false, dragStart = null;
-    let score = 0, timeLeft = 60, gameTimer = null;
-
-    function setupGame() {
-        document.getElementById('ult-heart').style.backgroundImage = gemStyles.red;
-        const container = document.getElementById('game-board');
-        for (let r = 0; r < ROWS; r++) {
-            board[r] = [];
-            for (let c = 0; c < COLS; c++) {
-                spawnGem(r, c, false);
-            }
-        }
-        cleanInitialMatches();
-        renderBoard();
-        initControls();
-        
-        gameTimer = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer-val').innerText = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(gameTimer);
-                setTimeout(() => {
-                    alert(`Час вийшов! Твій результат: ${score}`);
-                    location.reload();
-                }, 100);
-            }
-        }, 1000);
-    }
-
-    function spawnGem(r, c, isRain) {
-        const type = colorKeys[Math.floor(Math.random() * colorKeys.length)];
-        const el = document.createElement('div');
-        el.className = 'heart-item';
-        el.style.backgroundImage = gemStyles[type];
-
-        if (isRain) {
-            el.style.top = `${-Math.random() * 300 - 100}px`;
-        } else {
-            el.style.top = `${r * CELL}px`;
-        }
-        el.style.left = `${c * CELL}px`;
-        
-        document.getElementById('game-board').appendChild(el);
-        board[r][c] = { type, element: el };
-        
-        if (isRain) {
-            // Легкий ефект відскоку при падінні
-            setTimeout(() => { el.style.top = `${r * CELL}px`; }, 20);
-        }
-    }
-
-    function renderBoard() {
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (board[r][c]) {
-                    board[r][c].element.style.top = `${r * CELL}px`;
-                    board[r][c].element.style.left = `${c * CELL}px`;
-                }
-            }
-        }
-    }
-
-    function cleanInitialMatches() {
-        let hasMatches = true;
-        while (hasMatches) {
-            hasMatches = false;
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    if ((c < COLS - 2 && board[r][c].type === board[r][c+1].type && board[r][c].type === board[r][c+2].type) ||
-                        (r < ROWS - 2 && board[r][c].type === board[r+1][c].type && board[r][c].type === board[r+2][c].type)) {
-                        board[r][c].type = colorKeys[(colorKeys.indexOf(board[r][c].type) + 1) % colorKeys.length];
-                        board[r][c].element.style.backgroundImage = gemStyles[board[r][c].type];
-                        hasMatches = true;
-                    }
-                }
-            }
-        }
-    }
-
-    function initControls() {
-        const g = document.getElementById('game-board');
-        const getCoord = (e) => {
-            const r = g.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { c: Math.floor((clientX - r.left) / CELL), r: Math.floor((clientY - r.top) / CELL) };
-        };
-
-        const start = (e) => { if (isLocked) return; dragStart = getCoord(e); };
-        const move = (e) => {
-            if (!dragStart || isLocked) return;
-            const curr = getCoord(e);
-            const dr = curr.r - dragStart.r, dc = curr.c - dragStart.c;
-            if (Math.abs(dr) + Math.abs(dc) === 1) {
-                swapGems(dragStart, curr);
-                dragStart = null;
-            }
-        };
-
-        g.addEventListener('mousedown', start); g.addEventListener('mousemove', move);
-        g.addEventListener('touchstart', start, {passive:true}); g.addEventListener('touchmove', move, {passive:true});
-    }
-
-    async function swapGems(p1, p2) {
-        if (p1.r < 0 || p1.r >= ROWS || p1.c < 0 || p1.c >= COLS || p2.r < 0 || p2.r >= ROWS || p2.c < 0 || p2.c >= COLS) return;
-        isLocked = true;
-
-        let g1 = board[p1.r][p1.c], g2 = board[p2.r][p2.c];
-        board[p1.r][p1.c] = g2; board[p2.r][p2.c] = g1;
-        renderBoard();
-
-        await new Promise(r => setTimeout(r, 250));
-
-        if (!await checkMatches()) {
-            triggerHaptic('fail');
-            board[p1.r][p1.c] = g1; board[p2.r][p2.c] = g2;
-            renderBoard();
-            await new Promise(r => setTimeout(r, 200));
-            isLocked = false;
-        }
-    }
-
-    async function checkMatches() {
-        let matched = false;
-        let destroyGrid = Array(ROWS).fill(null).map(() => Array(COLS).fill(false));
-
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS - 2; c++) {
-                if (board[r][c] && board[r][c+1] && board[r][c+2] && board[r][c].type === board[r][c+1].type && board[r][c].type === board[r][c+2].type) {
-                    destroyGrid[r][c] = destroyGrid[r][c+1] = destroyGrid[r][c+2] = true; matched = true;
-                }
-            }
-        }
-        for (let c = 0; c < COLS; c++) {
-            for (let r = 0; r < ROWS - 2; r++) {
-                if (board[r][c] && board[r+1][c] && board[r+2][c] && board[r][c].type === board[r+1][c].type && board[r][c].type === board[r+2][c].type) {
-                    destroyGrid[r][c] = destroyGrid[r+1][c] = destroyGrid[r+2][c] = true; matched = true;
-                }
-            }
-        }
-
-        if (!matched) return false;
-
-        let visited = Array(ROWS).fill(null).map(() => Array(COLS).fill(false));
-        let isUltActive = false;
-
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (destroyGrid[r][c] && !visited[r][c]) {
-                    let cluster = [];
-                    getCluster(r, c, board[r][c].type, destroyGrid, visited, cluster);
-                    if (cluster.length >= 5 && cluster[0].type === 'red') {
-                        isUltActive = true;
-                    }
-                }
-            }
-        }
-
-        if (isUltActive) {
-            triggerHaptic('ult');
-            await runUltimate();
-        } else {
-            triggerHaptic('success');
-            await dissolveGems(destroyGrid);
-        }
-        return true;
-    }
-
-    function getCluster(r, c, type, destroyGrid, visited, cluster) {
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS || visited[r][c] || !destroyGrid[r][c] || board[r][c].type !== type) return;
-        visited[r][c] = true;
-        cluster.push({ r, c, type: board[r][c].type });
-        getCluster(r+1, c, type, destroyGrid, visited, cluster);
-        getCluster(r-1, c, type, destroyGrid, visited, cluster);
-        getCluster(r, c+1, type, destroyGrid, visited, cluster);
-        getCluster(r, c-1, type, destroyGrid, visited, cluster);
-    }
-
-    async function dissolveGems(destroyGrid) {
-        let count = 0;
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (destroyGrid[r][c] && board[r][c]) {
-                    count++;
-                    const el = board[r][c].element;
-                    el.style.transform = `scale(0)`;
-                    el.style.opacity = '0';
-                    setTimeout(((target) => () => target.remove())(el), 250);
-                    board[r][c] = null;
-                }
-            }
-        }
-        updateScore(count * 10);
-        await new Promise(r => setTimeout(r, 200));
-        await applyGravity();
-    }
-
-    async function runUltimate() {
-        const overlay = document.getElementById('ult-overlay');
-        const uHeart = document.getElementById('ult-heart');
-        
-        overlay.style.background = 'rgba(255,255,255,0.2)';
-        uHeart.style.width = '200px'; uHeart.style.height = '200px';
-
-        await new Promise(r => setTimeout(r, 500));
-        uHeart.style.transform = 'scale(0)';
-        overlay.style.background = 'rgba(255,255,255,0)';
-
-        const boardEl = document.getElementById('game-board');
-        for (let i = 0; i < 60; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.width = '20px'; p.style.height = '20px';
-            p.style.backgroundImage = gemStyles[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
-            p.style.left = '50%'; p.style.top = '50%';
-            p.style.setProperty('--tx', `${(Math.random() - 0.5) * 500}px`);
-            p.style.setProperty('--ty', `${(Math.random() - 0.5) * 700}px`);
-            boardEl.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-        }
-
-        let totalGems = 0;
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                if (board[r][c]) {
-                    totalGems++;
-                    board[r][c].element.remove();
-                    board[r][c] = null;
-                }
-            }
-        }
-
-        updateScore(totalGems * 15);
-        uHeart.style.width = '0px'; uHeart.style.height = '0px'; uHeart.style.transform = 'scale(1)';
-
-        await new Promise(r => setTimeout(r, 300));
-        
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                spawnGem(r, c, true);
-            }
-        }
-        await new Promise(r => setTimeout(r, 500));
-        await checkMatches();
-    }
-
-    async function applyGravity() {
-        for (let c = 0; c < COLS; c++) {
-            let empty = 0;
-            for (let r = ROWS - 1; r >= 0; r--) {
-                if (board[r][c] === null) { empty++; }
-                else if (empty > 0) {
-                    board[r + empty][c] = board[r][c];
-                    board[r][c] = null;
-                }
-            }
-            for (let i = 0; i < empty; i++) {
-                spawnGem(i, c, true);
-            }
-        }
-        renderBoard();
-        await new Promise(r => setTimeout(r, 400));
-        if (!await checkMatches()) { isLocked = false; }
-    }
-
-    function updateScore(amount) {
-        score += amount;
-        const sv = document.getElementById('score-val');
-        sv.innerText = score;
-        sv.style.transform = 'scale(1.2)';
-        setTimeout(() => sv.style.transform = 'scale(1)', 150);
-    }
 </script>
 </body>
 </html>
