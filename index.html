@@ -2,137 +2,182 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Для тебе</title>
+    <title>Для тебе ❤️</title>
     <style>
-        body, html {
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-            font-family: 'Arial', sans-serif;
+            height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #2c3e50, #000000);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+            perspective: 1000px; /* Для 3D ефекту */
         }
 
-        /* Екран старту */
-        #start-screen {
-            position: absolute;
-            z-index: 100;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 20px;
-            cursor: pointer;
-            border: 2px solid white;
-            border-radius: 10px;
+        /* Glassmorphism панель */
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
             text-align: center;
-        }
-
-        /* Серце */
-        #heart {
-            width: 100px;
-            height: 90px;
-            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
             z-index: 10;
-            animation: beat 0.5s infinite alternate;
-        }
-        #heart::before, #heart::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 50px;
-            height: 80px;
-            background: red;
-            border-radius: 50px 50px 0 0;
-        }
-        #heart::before { left: 50px; transform: rotate(-45deg); transform-origin: 0 100%; }
-        #heart::after { left: 0; transform: rotate(45deg); transform-origin: 100% 100%; }
-
-        @keyframes beat {
-            to { transform: scale(1.2); }
         }
 
-        /* Текст */
-        #message {
-            position: absolute;
-            bottom: 20%;
+        #game-container {
+            display: none;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(12, 50px);
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .cell { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        /* Сердечко 3D */
+        .heart {
+            width: 40px;
+            height: 40px;
+            transform-style: preserve-3d;
+            animation: rotateHeart 4s infinite linear;
+            clip-path: polygon(50% 100%, 0 40%, 20% 0, 50% 20%, 80% 0, 100% 40%);
+            /* Градієнт зі світлом справа */
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent), 
+                        linear-gradient(135deg, #ff4d4d, #b30000);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        @keyframes rotateHeart {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 3rem;
-            text-shadow: 0 0 10px red;
-            z-index: 10;
-            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            margin-top: 20px;
         }
-
-        /* Фігури */
-        .shape {
-            position: absolute;
-            animation: flicker 0.1s infinite;
-        }
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        button:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); }
     </style>
 </head>
 <body>
 
-    <div id="start-screen" onclick="start()">Натисни, щоб побачити магію ❤️</div>
-    <div id="heart"></div>
-    <div id="message"></div>
+    <div id="ui-layer" class="panel">
+        <h1 id="main-text"></h1>
+        <button id="btn-start" onclick="startExperience()">Натисни, щоб посилити магію ❤️</button>
+        <button id="btn-game" onclick="startGame()" style="display: none;">Грати в "Сердечка"</button>
+    </div>
 
-    <script>
-        const message = "Кохаю тебе манюнька";
-        const msgDiv = document.getElementById('message');
-        const startScreen = document.getElementById('start-screen');
+    <div id="game-container"></div>
 
-        function start() {
-            startScreen.style.display = 'none';
-            // Анімація тексту
-            let i = 0;
-            function typeWriter() {
-                if (i < message.length) {
-                    msgDiv.innerHTML += message.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, 150);
+<script>
+    const colors = ['#ff4d4d', '#ff9f43', '#feca57', '#54a0ff', '#5f27cd'];
+    let grid = [];
+
+    async function startExperience() {
+        document.getElementById('btn-start').style.display = 'none';
+        const text = "Я тебе кохаю манюня";
+        const h1 = document.getElementById('main-text');
+        for(let char of text) { h1.innerText += char; await new Promise(r => setTimeout(r, 150)); }
+        document.getElementById('btn-game').style.display = 'block';
+    }
+
+    function startGame() {
+        document.getElementById('ui-layer').style.display = 'none';
+        const container = document.getElementById('game-container');
+        container.style.display = 'grid';
+        
+        for(let r=0; r<12; r++) {
+            grid[r] = [];
+            for(let c=0; c<8; c++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                // Встановлюємо градієнт залежно від кольору
+                heart.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent), linear-gradient(135deg, ${color}, ${adjustColor(color, -50)})`;
+                
+                cell.appendChild(heart);
+                cell.onclick = () => handleCellClick(r, c);
+                container.appendChild(cell);
+                grid[r][c] = {color, element: heart};
+            }
+        }
+    }
+
+    // Допоміжна функція для затемнення кольору
+    function adjustColor(color, amount) {
+        return color; // В реальному проекті тут можна додати маніпуляції з RGB для глибини
+    }
+
+    function handleCellClick(r, c) {
+        const targetColor = grid[r][c].color;
+        let cluster = [];
+        findCluster(r, c, targetColor, cluster);
+
+        if (cluster.length >= 3) {
+            // Перевірка на ульту (червоний колір #ff4d4d)
+            if (targetColor === '#ff4d4d') {
+                cluster.forEach(item => item.element.style.opacity = '0');
+                setTimeout(() => alert("УЛЬТА! ❤️ Весь екран очищено!"), 200);
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                cluster.forEach(item => item.element.style.opacity = '0');
+                setTimeout(applyGravity, 300);
+            }
+        }
+    }
+
+    function findCluster(r, c, color, cluster) {
+        if (r < 0 || r >= 12 || c < 0 || c >= 8 || grid[r][c].color !== color || grid[r][c].visited) return;
+        grid[r][c].visited = true;
+        cluster.push(grid[r][c]);
+        findCluster(r+1, c, color, cluster);
+        findCluster(r-1, c, color, cluster);
+        findCluster(r, c+1, color, cluster);
+        findCluster(r, c-1, color, cluster);
+    }
+
+    function applyGravity() {
+        grid.forEach(row => row.forEach(cell => cell.visited = false));
+        for (let c = 0; c < 8; c++) {
+            for (let r = 11; r >= 0; r--) {
+                if (grid[r][c].element.style.opacity === '0') {
+                    for (let k = r; k > 0; k--) {
+                        grid[k][c].color = grid[k-1][c].color;
+                        grid[k][c].element.style.background = grid[k-1][c].element.style.background;
+                        grid[k][c].element.style.opacity = '1';
+                    }
+                    grid[0][c].color = colors[Math.floor(Math.random() * colors.length)];
+                    grid[0][c].element.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent), linear-gradient(135deg, ${grid[0][c].color}, ${grid[0][c].color})`;
+                    grid[0][c].element.style.opacity = '1';
                 }
             }
-            typeWriter();
-
-            // Створення фігур
-            setInterval(createShape, 50);
         }
-
-        function createShape() {
-            const shape = document.createElement('div');
-            shape.className = 'shape';
-            
-            // Випадковий тип (квадрат або трикутник)
-            const isSquare = Math.random() > 0.5;
-            const size = Math.random() * 50 + 10;
-            
-            shape.style.width = size + 'px';
-            shape.style.height = size + 'px';
-            shape.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            shape.style.left = Math.random() * window.innerWidth + 'px';
-            shape.style.top = Math.random() * window.innerHeight + 'px';
-
-            if (!isSquare) {
-                shape.style.backgroundColor = 'transparent';
-                shape.style.borderLeft = (size/2) + 'px solid transparent';
-                shape.style.borderRight = (size/2) + 'px solid transparent';
-                shape.style.borderBottom = size + 'px solid ' + `hsl(${Math.random() * 360}, 100%, 50%)`;
-                shape.style.width = '0';
-                shape.style.height = '0';
-            }
-
-            document.body.appendChild(shape);
-            
-            // Видаляємо фігуру через 0.5 сек, щоб не перевантажувати браузер
-            setTimeout(() => shape.remove(), 500);
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
