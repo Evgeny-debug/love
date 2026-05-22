@@ -4,171 +4,227 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Для Манюні ❤️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(20, 15, 25, 0.55);
-            --border: rgba(255, 100, 150, 0.25);
+            --glass: rgba(20, 15, 25, 0.65);
+            --border: rgba(255, 100, 150, 0.3);
             --neon: #ff2a5f;
+            --bg-grad: radial-gradient(circle at 50% 30%, #2b0b16, #0d040b, #000000);
         }
 
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: none; }
         body {
-            margin: 0; padding: 0; height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at 50% 30%, #2b0b16, #0d040b, #000000);
+            margin: 0; padding: 0; height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column;
+            background: var(--bg-grad);
             font-family: 'Montserrat', sans-serif;
-            color: white; overflow: hidden; touch-action: none;
+            color: white; overflow: hidden;
         }
+
+        /* Стартова анімація друкування */
+        #intro-screen {
+            position: absolute; inset: 0; background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fira Code', monospace; font-size: 1.3rem; color: #ffb3c6;
+            transition: opacity 1s ease;
+        }
+        .cursor { display: inline-block; width: 10px; height: 1.2rem; background: var(--neon); animation: blink 0.8s infinite; margin-left: 5px; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         /* Головне меню */
         #main-menu {
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            display: none; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+            height: 100%; padding: 40px; text-align: center; z-index: 10;
+        }
+        .menu-card {
             background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 40px; border-radius: 30px; border: 1px solid var(--border);
+            padding: 40px 30px; border-radius: 30px; border: 1px solid var(--border);
             box-shadow: 0 20px 60px rgba(255,42,95,0.15), inset 0 0 30px rgba(255,255,255,0.05);
-            text-align: center; z-index: 10;
+            width: 100%; max-width: 360px;
         }
         h1 { margin: 0 0 10px 0; font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--neon); }
         p.subtitle { margin: 0 0 30px 0; font-size: 1rem; color: #ffb3c6; }
 
         .btn {
             background: linear-gradient(135deg, #ff2a5f, #a0002d);
-            color: white; border: none; padding: 18px 40px; border-radius: 20px;
+            color: white; border: none; padding: 18px 20px; border-radius: 20px;
             font-size: 1.1rem; font-weight: 700; width: 100%; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255,42,95,0.4);
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 25px rgba(255,42,95,0.4); margin-bottom: 15px;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
         }
         .btn:active { transform: scale(0.92); box-shadow: 0 5px 15px rgba(255,42,95,0.6); }
-        .btn.secondary { background: linear-gradient(135deg, #7b2cbf, #3c096c); box-shadow: 0 10px 25px rgba(123,44,191,0.4); }
+        .btn.secondary { background: linear-gradient(135deg, #7b2cbf, #3c096c); box-shadow: 0 10px 25px rgba(123,44,191,0.4); margin-bottom: 0; }
 
-        /* Ігрові контейнери */
-        .game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; justify-content: center; position: absolute; inset: 0; }
-        
-        /* UI Панелі */
-        .top-bar {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; justify-content: space-between; align-items: center;
-            width: 360px; z-index: 50;
+        /* Ігрові контейнери (Адаптивні) */
+        .game-screen { 
+            display: none; flex-direction: column; width: 100%; height: 100%; 
+            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px;
         }
-        .back-btn {
-            background: var(--glass); border: 1px solid var(--border);
-            color: white; width: 45px; height: 45px; border-radius: 15px;
-            font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px);
+        
+        /* Верхній UI */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 400px; margin: 15px auto; z-index: 50;
         }
         .score-box {
-            background: var(--glass); border: 1px solid var(--border); border-radius: 15px;
-            padding: 8px 25px; text-align: center; backdrop-filter: blur(10px);
+            background: var(--glass); border: 1px solid var(--border); border-radius: 18px;
+            padding: 10px 30px; text-align: center; backdrop-filter: blur(15px); flex-grow: 1; margin: 0 10px;
         }
-        .score-val { font-size: 1.5rem; font-weight: 900; color: #ffb3c6; text-shadow: 0 0 10px rgba(255,179,198,0.5); }
+        .score-val { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,179,198,0.8); transition: transform 0.1s; }
+        .combo-badge { font-size: 0.8rem; color: #ffeb3b; font-weight: bold; position: absolute; right: 15px; top: 15px; opacity: 0; transition: opacity 0.3s; }
 
-        /* Гра 1: Сердечка */
+        /* Гра 1: Сердечка (Адаптивне поле) */
+        .board-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
         #match3-board {
-            position: relative; width: 360px; height: 540px;
-            background: rgba(10, 5, 15, 0.6); border-radius: 24px;
+            position: relative; width: 100%; max-width: 360px; aspect-ratio: 8 / 10;
+            background: rgba(10, 5, 15, 0.5); border-radius: 20px;
             border: 1px solid rgba(255,100,150,0.15);
             box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 20px 50px rgba(0,0,0,0.8);
-            overflow: hidden; margin-top: 50px;
+            overflow: hidden;
         }
-
-        .shake-board { animation: hardShake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes hardShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-1deg); } 75% { transform: translateX(5px) rotate(1deg); } }
-
         .gem {
-            position: absolute; width: 45px; height: 45px;
-            background-size: 85% 85%; background-position: center; background-repeat: no-repeat;
+            position: absolute; width: 12.5%; height: 10%; /* Відсотки для адаптивності */
+            background-size: 80% 80%; background-position: center; background-repeat: no-repeat;
             filter: drop-shadow(0px 6px 4px rgba(0,0,0,0.5));
-            transition: top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.25s ease-out, transform 0.15s ease;
+            transition: top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.3s ease-out, transform 0.15s ease;
             will-change: transform, top, left; cursor: pointer;
         }
-        .gem:active { transform: scale(0.85); filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.8)); }
+        .gem:active { transform: scale(0.85); }
+
+        /* Спливаючий текст очок */
+        .floating-text {
+            position: absolute; font-size: 1.5rem; font-weight: 900; color: #ffeb3b;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8); pointer-events: none; z-index: 100;
+            animation: floatUp 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 50% { transform: translateY(-30px) scale(1.2); } 100% { transform: translateY(-50px) scale(1); opacity: 0; } }
 
         /* Осколки руйнування */
         .shard {
             position: absolute; pointer-events: none; border-radius: 50%;
             animation: shatter 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-            will-change: transform, opacity;
         }
-        @keyframes shatter {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-        }
+        @keyframes shatter { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
 
         /* Гра 2: Flappy Heart */
         #flappy-board {
-            position: relative; width: 360px; height: 600px;
+            position: relative; width: 100%; max-width: 400px; height: 100%;
             background: linear-gradient(180deg, #1a0b2e 0%, #3a0ca3 100%);
-            border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.7); margin-top: 40px;
+            border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.7); touch-action: none;
         }
-        
         .flappy-bird {
-            position: absolute; width: 40px; height: 40px;
+            position: absolute; width: 45px; height: 45px;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-            left: 50px; top: 250px; z-index: 10;
-            filter: drop-shadow(0 0 15px rgba(255,42,95,0.8));
-            will-change: transform; transition: transform 0.1s;
+            left: 20%; z-index: 10; filter: drop-shadow(0 0 15px rgba(255,42,95,0.8));
+            will-change: transform, top;
         }
+        .trail {
+            position: absolute; width: 10px; height: 10px; background: #ffb3c6; border-radius: 50%;
+            pointer-events: none; animation: fadeTrail 0.4s linear forwards;
+        }
+        @keyframes fadeTrail { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(0); } }
 
         .pipe {
             position: absolute; width: 60px;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0 L100 0 L80 20 L100 40 L80 60 L100 80 L50 100 L0 80 L20 60 L0 40 L20 20 Z' fill='%232d6a4f'/%3E%3C/svg%3E");
-            background-size: 100% 100px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
-            will-change: left;
+            background: linear-gradient(90deg, #1b4332, #2d6a4f, #1b4332);
+            border: 2px solid #081c15; border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6); will-change: left;
         }
-        .pipe.top { transform: scaleY(-1); } /* Перевертаємо верхній шип */
+        .pipe.top { border-bottom: 5px solid #081c15; border-radius: 5px 5px 0 0; }
+        .pipe.bot { border-top: 5px solid #081c15; border-radius: 0 0 5px 5px; }
+        
+        .rose-item {
+            position: absolute; width: 35px; height: 35px;
+            font-size: 28px; display: flex; align-items: center; justify-content: center;
+            filter: drop-shadow(0 0 10px #ff2a5f); will-change: left;
+            animation: pulseRose 1s infinite alternate;
+        }
+        @keyframes pulseRose { 0% { transform: scale(0.9) rotate(-5deg); } 100% { transform: scale(1.1) rotate(5deg); } }
 
         #flappy-game-over {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+            position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         #flappy-game-over.active { opacity: 1; pointer-events: all; }
 
+        /* Нижній Бар (Спільний) */
+        .bottom-bar {
+            display: flex; justify-content: space-around; align-items: center;
+            background: var(--glass); backdrop-filter: blur(15px); border-top: 1px solid var(--border);
+            padding: 15px; margin-top: 10px; border-radius: 25px 25px 0 0;
+            width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;
+        }
+        .bb-btn {
+            background: none; border: none; color: white; font-family: inherit;
+            font-size: 0.9rem; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            opacity: 0.7; cursor: pointer; transition: opacity 0.2s;
+        }
+        .bb-btn:active { opacity: 1; transform: scale(0.9); }
+        .bb-icon { font-size: 1.5rem; }
+
+        /* Трясучка камери */
+        .shake { animation: hardShake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes hardShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-1deg); } 75% { transform: translateX(5px) rotate(1deg); } }
+
     </style>
 </head>
 <body>
 
+    <!-- ІНТРО АНІМАЦІЯ -->
+    <div id="intro-screen"><span id="typewriter"></span><span class="cursor"></span></div>
+
     <!-- ГОЛОВНЕ МЕНЮ -->
     <div id="main-menu">
-        <div>
-            <h1>Обери гру ❤️</h1>
-            <p class="subtitle">Спеціально для тебе, манюня</p>
+        <div class="menu-card">
+            <h1>Ігровий Хаб ❤️</h1>
+            <p class="subtitle">Лише для тебе, манюня</p>
+            <button class="btn" onclick="app.startMatch3()">💎 Кристальні Сердечка</button>
+            <button class="btn secondary" onclick="app.startFlappy()">🕊️ Політ Кохання</button>
         </div>
-        <button class="btn" onclick="app.startMatch3()">Кристальні Сердечка</button>
-        <button class="btn secondary" onclick="app.startFlappy()">Політ Кохання</button>
     </div>
 
     <!-- ГРА 1: MATCH-3 -->
     <div id="game1" class="game-screen">
         <div class="top-bar">
-            <div class="back-btn" onclick="app.showMenu()">❮</div>
-            <div class="score-box">
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ОЧКИ</div>
+            <div class="score-box" style="position:relative;">
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ТВІЙ РАХУНОК</div>
                 <div id="m3-score" class="score-val">0</div>
+                <div id="m3-combo" class="combo-badge">x2 COMBO!</div>
             </div>
-            <div style="width: 45px;"></div>
         </div>
-        <div id="match3-board"></div>
+        <div class="board-container">
+            <div id="match3-board"></div>
+        </div>
+        <div class="bottom-bar">
+            <button class="bb-btn" onclick="app.showMenu()"><span class="bb-icon">🏠</span>Меню</button>
+            <button class="bb-btn" onclick="match3.init()"><span class="bb-icon">🔄</span>Заново</button>
+        </div>
     </div>
 
     <!-- ГРА 2: FLAPPY HEART -->
     <div id="game2" class="game-screen">
         <div class="top-bar">
-            <div class="back-btn" onclick="app.showMenu()">❮</div>
             <div class="score-box">
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ПЕРЕШКОДИ</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">ОЧКИ</div>
                 <div id="fl-score" class="score-val">0</div>
             </div>
-            <div style="width: 45px;"></div>
         </div>
-        <div id="flappy-board" onmousedown="flappy.jump()" ontouchstart="flappy.jump()">
-            <div id="f-bird" class="flappy-bird"></div>
-            <div id="flappy-game-over">
-                <h2 style="color:#ff2a5f; margin-bottom: 20px;">Ой, шипи! 🌹</h2>
-                <button class="btn" style="width:200px;" onclick="flappy.reset(event)">Спробувати ще</button>
+        <div class="board-container">
+            <div id="flappy-board" onmousedown="flappy.jump()" ontouchstart="flappy.jump()">
+                <div id="f-bird" class="flappy-bird"></div>
+                <div id="flappy-game-over">
+                    <h2 style="color:#ff2a5f; margin-bottom: 20px; text-shadow: 0 0 10px #ff2a5f;">Ой, шипи! 💥</h2>
+                    <div style="font-size:1.2rem; margin-bottom:30px;">Рахунок: <span id="fl-final-score">0</span></div>
+                    <button class="btn" style="width:200px;" onclick="flappy.reset(event)">Спробувати ще</button>
+                </div>
             </div>
+        </div>
+        <div class="bottom-bar">
+            <button class="bb-btn" onclick="app.showMenu()"><span class="bb-icon">🏠</span>Меню</button>
+            <button class="bb-btn" onclick="flappy.reset(event)"><span class="bb-icon">🔄</span>Заново</button>
         </div>
     </div>
 
@@ -203,26 +259,49 @@
     function vibrate(type) {
         if (!navigator.vibrate) return;
         if (type === 'tap') navigator.vibrate(5);
-        if (type === 'match') navigator.vibrate(15);
-        if (type === 'fail') navigator.vibrate([20, 30, 20]);
-        if (type === 'ult') navigator.vibrate([40, 40, 80, 40, 150]);
+        if (type === 'match') navigator.vibrate([15, 30, 15]);
+        if (type === 'fail') navigator.vibrate([30, 40, 30]);
+        if (type === 'rose') navigator.vibrate([10, 20, 10]);
         if (type === 'crash') navigator.vibrate([50, 50, 100]);
     }
 
     // --- ГЛОБАЛЬНИЙ МЕНЕДЖЕР ---
     const app = {
-        showMenu: () => {
+        init() {
+            // Анімація друкування
+            const text = "Привіт, манюня... ❤️\nГотова до магії?";
+            let i = 0;
+            const tw = document.getElementById('typewriter');
+            const typeWriter = () => {
+                if (i < text.length) {
+                    tw.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+                    i++;
+                    vibrate('tap');
+                    setTimeout(typeWriter, Math.random() * 50 + 50);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('intro-screen').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('intro-screen').style.display = 'none';
+                            this.showMenu();
+                        }, 1000);
+                    }, 1000);
+                }
+            };
+            setTimeout(typeWriter, 500);
+        },
+        showMenu() {
             document.getElementById('main-menu').style.display = 'flex';
             document.getElementById('game1').style.display = 'none';
             document.getElementById('game2').style.display = 'none';
-            flappy.stop(); // Зупиняємо цикл Flappy
+            flappy.stop();
         },
-        startMatch3: () => {
+        startMatch3() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game1').style.display = 'flex';
             match3.init();
         },
-        startFlappy: () => {
+        startFlappy() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game2').style.display = 'flex';
             flappy.init();
@@ -233,10 +312,10 @@
     // ГРА 1: КРИСТАЛЬНІ СЕРДЕЧКА (MATCH-3)
     // ==========================================
     const match3 = {
-        board: [], ROWS: 12, COLS: 8, CELL: 45, score: 0, locked: false, dragStart: null,
+        board: [], ROWS: 10, COLS: 8, score: 0, locked: false, dragStart: null, combo: 1,
         
         init() {
-            this.board = []; this.score = 0; this.updateScore(0);
+            this.board = []; this.score = 0; this.combo = 1; this.updateScore(0);
             const container = document.getElementById('match3-board');
             container.innerHTML = '';
             for (let r = 0; r < this.ROWS; r++) {
@@ -253,19 +332,19 @@
             const el = document.createElement('div');
             el.className = 'gem';
             el.style.backgroundImage = gemData[type].bg;
-            el.style.top = isRain ? `${-Math.random() * 200 - 50}px` : `${r * this.CELL}px`;
-            el.style.left = `${c * this.CELL}px`;
+            el.style.top = isRain ? `-20%` : `${r * 10}%`;
+            el.style.left = `${c * 12.5}%`;
             document.getElementById('match3-board').appendChild(el);
             this.board[r][c] = { type, element: el };
-            if (isRain) setTimeout(() => { if(this.board[r][c]) this.board[r][c].element.style.top = `${r * this.CELL}px`; }, 20);
+            if (isRain) setTimeout(() => { if(this.board[r][c]) this.board[r][c].element.style.top = `${r * 10}%`; }, 20);
         },
 
         render() {
             for (let r=0; r<this.ROWS; r++) {
                 for (let c=0; c<this.COLS; c++) {
                     if (this.board[r][c]) {
-                        this.board[r][c].element.style.top = `${r * this.CELL}px`;
-                        this.board[r][c].element.style.left = `${c * this.CELL}px`;
+                        this.board[r][c].element.style.top = `${r * 10}%`;
+                        this.board[r][c].element.style.left = `${c * 12.5}%`;
                     }
                 }
             }
@@ -292,9 +371,11 @@
             const getC = (e) => {
                 const rect = el.getBoundingClientRect();
                 const evt = e.touches ? e.touches[0] : e;
-                return { c: Math.floor((evt.clientX - rect.left) / this.CELL), r: Math.floor((evt.clientY - rect.top) / this.CELL) };
+                const c = Math.floor((evt.clientX - rect.left) / (rect.width / this.COLS));
+                const r = Math.floor((evt.clientY - rect.top) / (rect.height / this.ROWS));
+                return { c, r };
             };
-            const start = (e) => { if(!this.locked) this.dragStart = getC(e); };
+            const start = (e) => { if(!this.locked) { this.dragStart = getC(e); this.combo = 1; } };
             const move = (e) => {
                 if(!this.dragStart || this.locked) return;
                 const curr = getC(e);
@@ -314,15 +395,15 @@
             let g1 = this.board[p1.r][p1.c], g2 = this.board[p2.r][p2.c];
             this.board[p1.r][p1.c] = g2; this.board[p2.r][p2.c] = g1;
             this.render();
-            await new Promise(r => setTimeout(r, 250));
+            await new Promise(r => setTimeout(r, 300));
 
             if (!await this.checkMatches()) {
                 vibrate('fail');
                 const b = document.getElementById('match3-board');
-                b.classList.remove('shake-board'); void b.offsetWidth; b.classList.add('shake-board');
+                b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
                 this.board[p1.r][p1.c] = g1; this.board[p2.r][p2.c] = g2;
                 this.render();
-                await new Promise(r => setTimeout(r, 200));
+                await new Promise(r => setTimeout(r, 250));
                 this.locked = false;
             }
         },
@@ -330,12 +411,14 @@
         async checkMatches() {
             let matched = false;
             let dGrid = Array(this.ROWS).fill(null).map(() => Array(this.COLS).fill(false));
+            let matchCenters = [];
 
             for (let r=0; r<this.ROWS; r++) {
                 for (let c=0; c<this.COLS-2; c++) {
                     if (this.board[r][c] && this.board[r][c+1] && this.board[r][c+2] && 
                         this.board[r][c].type===this.board[r][c+1].type && this.board[r][c].type===this.board[r][c+2].type) {
                         dGrid[r][c] = dGrid[r][c+1] = dGrid[r][c+2] = true; matched = true;
+                        matchCenters.push({r, c: c+1});
                     }
                 }
             }
@@ -344,81 +427,68 @@
                     if (this.board[r][c] && this.board[r+1][c] && this.board[r+2][c] && 
                         this.board[r][c].type===this.board[r+1][c].type && this.board[r][c].type===this.board[r+2][c].type) {
                         dGrid[r][c] = dGrid[r+1][c] = dGrid[r+2][c] = true; matched = true;
+                        matchCenters.push({r: r+1, c});
                     }
                 }
             }
 
             if (!matched) return false;
 
-            // Шанс на Ульту: 10%
-            let isUlt = Math.random() < 0.10; 
-
-            if (isUlt) {
-                vibrate('ult'); await this.runUlt();
-            } else {
-                vibrate('match'); await this.dissolve(dGrid);
-            }
+            vibrate('match');
+            
+            // Floating score text
+            const pts = 10 * this.combo;
+            matchCenters.forEach(center => this.showFloatingText(`+${pts}`, center.c, center.r));
+            
+            await this.dissolve(dGrid, pts);
             return true;
         },
 
-        explodeParticles(x, y, color) {
+        showFloatingText(text, c, r) {
             const b = document.getElementById('match3-board');
-            for(let i=0; i<5; i++) {
+            const f = document.createElement('div');
+            f.className = 'floating-text'; f.innerText = text;
+            f.style.left = `calc(${c * 12.5}% + 10px)`; f.style.top = `${r * 10}%`;
+            if(this.combo > 1) {
+                f.style.color = '#ff2a5f'; f.style.fontSize = '2rem';
+                const cb = document.getElementById('m3-combo');
+                cb.innerText = `x${this.combo} COMBO!`; cb.style.opacity = '1';
+                setTimeout(() => cb.style.opacity = '0', 1000);
+            }
+            b.appendChild(f); setTimeout(() => f.remove(), 800);
+        },
+
+        explodeParticles(c, r, color) {
+            const b = document.getElementById('match3-board');
+            for(let i=0; i<4; i++) {
                 let p = document.createElement('div');
-                p.className = 'shard';
-                p.style.width = p.style.height = (Math.random() * 8 + 6) + 'px';
-                p.style.backgroundColor = color;
-                p.style.left = (x + 20) + 'px'; p.style.top = (y + 20) + 'px';
-                p.style.setProperty('--dx', (Math.random() - 0.5) * 80 + 'px');
-                p.style.setProperty('--dy', (Math.random() - 0.5) * 80 + 'px');
-                b.appendChild(p);
-                setTimeout(() => p.remove(), 500);
+                p.className = 'shard'; p.style.backgroundColor = color;
+                p.style.width = p.style.height = (Math.random() * 6 + 6) + 'px';
+                p.style.left = `calc(${c * 12.5}% + 15px)`; p.style.top = `calc(${r * 10}% + 15px)`;
+                p.style.setProperty('--dx', (Math.random() - 0.5) * 60 + 'px');
+                p.style.setProperty('--dy', (Math.random() - 0.5) * 60 + 'px');
+                b.appendChild(p); setTimeout(() => p.remove(), 500);
             }
         },
 
-        async dissolve(dGrid) {
+        async dissolve(dGrid, ptsPerBlock) {
             let count = 0;
             for (let r=0; r<this.ROWS; r++) {
                 for (let c=0; c<this.COLS; c++) {
                     if (dGrid[r][c] && this.board[r][c]) {
                         count++;
                         let el = this.board[r][c].element;
-                        this.explodeParticles(c*this.CELL, r*this.CELL, gemData[this.board[r][c].type].color);
+                        this.explodeParticles(c, r, gemData[this.board[r][c].type].color);
                         el.style.transform = `scale(0)`; el.style.opacity = '0';
                         setTimeout(((target) => () => target.remove())(el), 200);
                         this.board[r][c] = null;
                     }
                 }
             }
-            this.updateScore(count * 10);
-            await new Promise(r => setTimeout(r, 250));
+            this.updateScore(count * ptsPerBlock);
+            await new Promise(r => setTimeout(r, 200));
+            this.combo++;
             await this.applyGravity();
-        },
-
-        async runUlt() {
-            const b = document.getElementById('match3-board');
-            b.classList.add('shake-board');
-            setTimeout(() => b.classList.remove('shake-board'), 300);
-
-            let count = 0;
-            for (let r=0; r<this.ROWS; r++) {
-                for (let c=0; c<this.COLS; c++) {
-                    if (this.board[r][c]) {
-                        count++;
-                        this.explodeParticles(c*this.CELL, r*this.CELL, gemData[this.board[r][c].type].color);
-                        this.board[r][c].element.remove();
-                        this.board[r][c] = null;
-                    }
-                }
-            }
-            this.updateScore(count * 15);
-            await new Promise(r => setTimeout(r, 400));
-            
-            for (let r=0; r<this.ROWS; r++) {
-                for (let c=0; c<this.COLS; c++) this.spawnGem(r, c, true);
-            }
-            await new Promise(r => setTimeout(r, 500));
-            if(!await this.checkMatches()) this.locked = false;
         },
 
         async applyGravity() {
@@ -434,7 +504,7 @@
                 for (let i=0; i<empty; i++) this.spawnGem(i, c, true);
             }
             this.render();
-            await new Promise(r => setTimeout(r, 350));
+            await new Promise(r => setTimeout(r, 400));
             if (!await this.checkMatches()) this.locked = false;
         },
 
@@ -442,7 +512,7 @@
             this.score += amt;
             const sv = document.getElementById('m3-score');
             sv.innerText = this.score;
-            sv.style.transform = 'scale(1.3)'; setTimeout(() => sv.style.transform = 'scale(1)', 150);
+            sv.style.transform = 'scale(1.2)'; setTimeout(() => sv.style.transform = 'scale(1)', 100);
         }
     };
 
@@ -450,8 +520,9 @@
     // ГРА 2: FLAPPY HEART (ПОЛІТ КОХАННЯ)
     // ==========================================
     const flappy = {
-        birdY: 250, velocity: 0, gravity: 0.4, jumpStrength: -7,
-        pipes: [], pipeSpeed: 3, frameNum: 0, score: 0, reqId: null, isRunning: false,
+        birdY: 0, velocity: 0, gravity: 0.35, jumpStrength: -6,
+        pipes: [], roses: [], frameNum: 0, score: 0, reqId: null, isRunning: false,
+        boardH: 0, boardW: 0,
 
         init() {
             document.getElementById('f-bird').style.backgroundImage = gemData.red.bg;
@@ -460,9 +531,14 @@
 
         reset(e) {
             if(e) e.stopPropagation();
-            this.birdY = 250; this.velocity = 0; this.score = 0;
-            this.pipes.forEach(p => p.topEl.remove() || p.botEl.remove());
-            this.pipes = []; this.frameNum = 0;
+            const b = document.getElementById('flappy-board');
+            this.boardH = b.clientHeight; this.boardW = b.clientWidth;
+            
+            this.birdY = this.boardH / 2; this.velocity = 0; this.score = 0;
+            this.pipes.forEach(p => { p.topEl.remove(); p.botEl.remove(); });
+            this.roses.forEach(r => r.el.remove());
+            this.pipes = []; this.roses = []; this.frameNum = 0;
+            
             document.getElementById('flappy-game-over').classList.remove('active');
             document.getElementById('fl-score').innerText = '0';
             this.isRunning = true;
@@ -478,99 +554,138 @@
             if(!this.isRunning) return;
             this.velocity = this.jumpStrength;
             vibrate('tap');
-            document.getElementById('f-bird').style.transform = 'rotate(-15deg) scale(1.1)';
+            document.getElementById('f-bird').style.transform = 'rotate(-20deg) scale(1.1)';
         },
 
         spawnPipe() {
             const gap = 160; 
-            const minHeight = 50;
-            const boardHeight = 600;
-            // Випадкова висота верхнього шипа
-            const topHeight = Math.floor(Math.random() * (boardHeight - gap - minHeight * 2)) + minHeight;
-            const botHeight = boardHeight - topHeight - gap;
+            const minH = 50;
+            const topH = Math.floor(Math.random() * (this.boardH - gap - minH * 2)) + minH;
+            const botH = this.boardH - topH - gap;
 
             const board = document.getElementById('flappy-board');
             
             const topEl = document.createElement('div');
             topEl.className = 'pipe top';
-            topEl.style.height = topHeight + 'px';
-            topEl.style.left = '360px'; topEl.style.top = '0px';
+            topEl.style.height = topH + 'px';
+            topEl.style.left = this.boardW + 'px'; topEl.style.top = '0px';
 
             const botEl = document.createElement('div');
-            botEl.className = 'pipe';
-            botEl.style.height = botHeight + 'px';
-            botEl.style.left = '360px'; botEl.style.bottom = '0px';
+            botEl.className = 'pipe bot';
+            botEl.style.height = botH + 'px';
+            botEl.style.left = this.boardW + 'px'; botEl.style.bottom = '0px';
 
             board.appendChild(topEl); board.appendChild(botEl);
-            this.pipes.push({ x: 360, topEl, botEl, passed: false });
+            this.pipes.push({ x: this.boardW, topEl, botEl, passed: false, w: 60 });
+
+            // Шанс 50% створити троянду між шипами
+            if (Math.random() > 0.5) {
+                const roseEl = document.createElement('div');
+                roseEl.className = 'rose-item'; roseEl.innerText = '🌹';
+                roseEl.style.left = (this.boardW + 15) + 'px';
+                roseEl.style.top = (topH + gap/2 - 15) + 'px';
+                board.appendChild(roseEl);
+                this.roses.push({ x: this.boardW + 15, y: topH + gap/2 - 15, el: roseEl, collected: false });
+            }
+        },
+
+        spawnTrail() {
+            const board = document.getElementById('flappy-board');
+            const t = document.createElement('div');
+            t.className = 'trail';
+            t.style.left = (this.boardW * 0.2 + 10) + 'px';
+            t.style.top = (this.birdY + 20) + 'px';
+            board.appendChild(t);
+            setTimeout(() => t.remove(), 400);
         },
 
         loop() {
             if(!this.isRunning) return;
 
-            // Фізика
+            // Фізика пташки
             this.velocity += this.gravity;
             this.birdY += this.velocity;
             
             const birdEl = document.getElementById('f-bird');
             birdEl.style.top = this.birdY + 'px';
             
-            // Плавне обертання при падінні
-            if (this.velocity > 2) birdEl.style.transform = `rotate(${Math.min(this.velocity * 3, 45)}deg)`;
+            if (this.velocity > 2) birdEl.style.transform = `rotate(${Math.min(this.velocity * 4, 60)}deg)`;
+            if (this.frameNum % 4 === 0) this.spawnTrail();
 
-            // Створення перешкод (кожні 80 кадрів)
-            if (this.frameNum % 80 === 0) this.spawnPipe();
+            // Перешкоди
+            const speed = 3.5;
+            const birdL = this.boardW * 0.2 + 5;
+            const birdR = birdL + 30;
+            const birdT = this.birdY + 5;
+            const birdB = this.birdY + 35;
 
-            // Рух перешкод та зіткнення
+            if (this.frameNum % 90 === 0) this.spawnPipe();
+
             for (let i = this.pipes.length - 1; i >= 0; i--) {
                 let p = this.pipes[i];
-                p.x -= this.pipeSpeed;
-                p.topEl.style.left = p.x + 'px';
-                p.botEl.style.left = p.x + 'px';
+                p.x -= speed;
+                p.topEl.style.left = p.x + 'px'; p.botEl.style.left = p.x + 'px';
 
-                // Зіткнення (Hitbox пташки: X:50-80, Y:birdY - birdY+30)
-                let birdRect = { l: 55, r: 85, t: this.birdY + 5, b: this.birdY + 35 };
-                let topRect = { l: p.x, r: p.x + 60, b: parseFloat(p.topEl.style.height) };
-                let botRect = { l: p.x, r: p.x + 60, t: 600 - parseFloat(p.botEl.style.height) };
+                let pipeR = p.x + p.w;
+                let topB = parseFloat(p.topEl.style.height);
+                let botT = this.boardH - parseFloat(p.botEl.style.height);
 
-                if (birdRect.r > topRect.l && birdRect.l < topRect.r) {
-                    if (birdRect.t < topRect.b || birdRect.b > botRect.t) {
-                        this.gameOver(); return;
-                    }
+                // Collision
+                if (birdR > p.x && birdL < pipeR) {
+                    if (birdT < topB || birdB > botT) { this.gameOver(); return; }
                 }
 
-                // Підрахунок очок
-                if (p.x < 50 && !p.passed) {
-                    p.passed = true;
-                    this.score++;
-                    document.getElementById('fl-score').innerText = this.score;
+                if (p.x + p.w < birdL && !p.passed) {
+                    p.passed = true; this.score++; this.updateScore();
                 }
 
-                // Видалення старих шипів
-                if (p.x < -60) {
-                    p.topEl.remove(); p.botEl.remove();
-                    this.pipes.splice(i, 1);
+                if (p.x < -70) {
+                    p.topEl.remove(); p.botEl.remove(); this.pipes.splice(i, 1);
                 }
             }
 
-            // Зіткнення з підлогою/стелею
-            if (this.birdY > 560 || this.birdY < -20) {
-                this.gameOver(); return;
+            // Троянди
+            for (let i = this.roses.length - 1; i >= 0; i--) {
+                let r = this.roses[i];
+                if(r.collected) continue;
+                r.x -= speed;
+                r.el.style.left = r.x + 'px';
+
+                // Rose collision
+                if (birdR > r.x && birdL < r.x + 35 && birdB > r.y && birdT < r.y + 35) {
+                    r.collected = true;
+                    r.el.style.transform = 'scale(2)'; r.el.style.opacity = '0';
+                    setTimeout(() => r.el.remove(), 200);
+                    this.score += 5; this.updateScore();
+                    vibrate('rose');
+                }
+
+                if (r.x < -50) { r.el.remove(); this.roses.splice(i, 1); }
             }
+
+            if (this.birdY > this.boardH - 20 || this.birdY < -20) { this.gameOver(); return; }
 
             this.frameNum++;
             this.reqId = requestAnimationFrame(() => this.loop());
         },
 
+        updateScore() {
+            const el = document.getElementById('fl-score');
+            el.innerText = this.score;
+            el.style.transform = 'scale(1.3)'; setTimeout(() => el.style.transform = 'scale(1)', 100);
+        },
+
         gameOver() {
-            this.isRunning = false;
-            vibrate('crash');
+            this.isRunning = false; vibrate('crash');
             const board = document.getElementById('flappy-board');
-            board.classList.add('shake-board');
-            setTimeout(() => board.classList.remove('shake-board'), 300);
+            board.classList.add('shake'); setTimeout(() => board.classList.remove('shake'), 300);
+            document.getElementById('fl-final-score').innerText = this.score;
             document.getElementById('flappy-game-over').classList.add('active');
         }
     };
+
+    // Запуск при завантаженнии
+    window.onload = () => app.init();
 
 </script>
 </body>
