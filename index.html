@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебе</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Екран старту */
+        #start-screen {
+            position: absolute;
+            z-index: 100;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            border: 2px solid white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Серце */
+        #heart {
+            width: 100px;
+            height: 90px;
+            position: relative;
+            z-index: 10;
+            animation: beat 0.5s infinite alternate;
+        }
+        #heart::before, #heart::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 50px;
+            height: 80px;
+            background: red;
+            border-radius: 50px 50px 0 0;
+        }
+        #heart::before { left: 50px; transform: rotate(-45deg); transform-origin: 0 100%; }
+        #heart::after { left: 0; transform: rotate(45deg); transform-origin: 100% 100%; }
+
+        @keyframes beat {
+            to { transform: scale(1.2); }
+        }
+
+        /* Текст */
+        #message {
+            position: absolute;
+            bottom: 20%;
+            color: white;
+            font-size: 3rem;
+            text-shadow: 0 0 10px red;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        /* Фігури */
+        .shape {
+            position: absolute;
+            animation: flicker 0.1s infinite;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" onclick="start()">Натисни, щоб побачити магію ❤️</div>
+    <div id="heart"></div>
+    <div id="message"></div>
+
+    <script>
+        const message = "Кохаю тебе манюнька";
+        const msgDiv = document.getElementById('message');
+        const startScreen = document.getElementById('start-screen');
+
+        function start() {
+            startScreen.style.display = 'none';
+            // Анімація тексту
+            let i = 0;
+            function typeWriter() {
+                if (i < message.length) {
+                    msgDiv.innerHTML += message.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 150);
+                }
+            }
+            typeWriter();
+
+            // Створення фігур
+            setInterval(createShape, 50);
+        }
+
+        function createShape() {
+            const shape = document.createElement('div');
+            shape.className = 'shape';
+            
+            // Випадковий тип (квадрат або трикутник)
+            const isSquare = Math.random() > 0.5;
+            const size = Math.random() * 50 + 10;
+            
+            shape.style.width = size + 'px';
+            shape.style.height = size + 'px';
+            shape.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            shape.style.left = Math.random() * window.innerWidth + 'px';
+            shape.style.top = Math.random() * window.innerHeight + 'px';
+
+            if (!isSquare) {
+                shape.style.backgroundColor = 'transparent';
+                shape.style.borderLeft = (size/2) + 'px solid transparent';
+                shape.style.borderRight = (size/2) + 'px solid transparent';
+                shape.style.borderBottom = size + 'px solid ' + `hsl(${Math.random() * 360}, 100%, 50%)`;
+                shape.style.width = '0';
+                shape.style.height = '0';
+            }
+
+            document.body.appendChild(shape);
+            
+            // Видаляємо фігуру через 0.5 сек, щоб не перевантажувати браузер
+            setTimeout(() => shape.remove(), 500);
+        }
+    </script>
+</body>
+</html>
