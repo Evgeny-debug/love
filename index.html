@@ -13,75 +13,77 @@
             --accent-hover: #ff758f;
             --text: #ffffff;
         }
-        * { box-sizing: border-box; touch-action: manipulation; user-select: none; margin: 0; padding: 0; }
+        * { box-sizing: border-box; touch-action: none; user-select: none; margin: 0; padding: 0; }
         body { 
             background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center;
         }
         
-        /* Glassmorphism UI */
         .glass { background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); }
         .btn { 
             padding: 15px 30px; border: 1px solid var(--glass-border); border-radius: 15px; 
             background: var(--glass); color: white; cursor: pointer; margin: 8px; width: 85%; max-width: 300px;
-            font-size: 18px; font-weight: bold; transition: 0.3s;
+            font-size: 18px; font-weight: bold; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn:active { background: var(--accent); transform: scale(0.95); }
+        .btn:active { background: var(--accent); transform: scale(0.9); }
         
-        /* Screens */
         #intro-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .heart-loader { color: var(--accent); font-size: 50px; animation: pulse 1s infinite alternate; margin-bottom: 20px; }
-        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+        .heart-loader { color: var(--accent); font-size: 50px; animation: pulse 0.8s infinite alternate; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--accent)); }
+        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.3); } }
         
-        #app { width: 100%; max-width: 450px; height: 100%; position: relative; display: none; background: radial-gradient(circle at top right, #2b0b12, #050505); }
+        #app { width: 100%; max-width: 450px; height: 100%; position: relative; display: none; background: radial-gradient(circle at top right, #2b0b12, #050505); transition: transform 0.1s; }
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; position: absolute; }
-        .screen.active { display: flex; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { display: flex; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         h1, h2 { color: var(--accent); margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(255,77,109,0.5); }
-        .header { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; pointer-events: none; }
+        .header { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; pointer-events: none; z-index: 5; }
         .back-btn { position: absolute; bottom: 30px; z-index: 100; }
+
+        /* UI elements */
+        .hud { position: absolute; top: 15px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; font-size: 22px; font-weight: bold; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .lives { color: var(--accent); }
 
         /* Tic Tac Toe */
         .diff-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .diff-btn { padding: 8px 15px; border-radius: 10px; background: transparent; color: white; border: 1px solid var(--accent); cursor: pointer; }
-        .diff-btn.active { background: var(--accent); }
-        .ttt-grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; margin-bottom: 30px; }
-        .ttt-cell { 
-            width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; 
-            font-size: 45px; font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .ttt-cell.x { color: var(--accent); }
-        .ttt-cell.o { color: #4dabf7; }
+        .diff-btn { padding: 8px 15px; border-radius: 10px; background: transparent; color: white; border: 1px solid var(--accent); transition: 0.2s; }
+        .diff-btn.active { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 15px var(--accent); }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; margin-bottom: 30px; perspective: 500px; }
+        .ttt-cell { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 45px; transition: 0.3s transform; }
+        .ttt-cell:active { transform: translateZ(-20px); }
 
         /* Match 3 */
         #match3-board { display: grid; gap: 5px; background: var(--glass); padding: 10px; border-radius: 15px; }
-        .gem { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; border-radius: 10px; transition: 0.2s; }
-        .gem.selected { transform: scale(1.1); box-shadow: 0 0 15px var(--accent); background: rgba(255,255,255,0.2); }
+        .gem { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 30px; border-radius: 10px; transition: transform 0.2s, opacity 0.2s; }
+        .gem.selected { transform: scale(1.15); box-shadow: 0 0 20px var(--accent); background: rgba(255,255,255,0.3); z-index: 2; }
+        .gem.popping { transform: scale(0); opacity: 0; }
+
+        /* Canvas Games */
+        .canvas-container { width: 100%; height: 65vh; position: relative; margin-top: 30px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; border-radius: 20px; }
         
-        /* Game Canvas Containers (Helix & Flappy) */
-        .canvas-container { width: 100%; height: 60vh; position: relative; margin-top: 50px; overflow: hidden; }
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; border-radius: 20px; }
-        .score-display { position: absolute; top: 10px; right: 20px; font-size: 24px; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 10; }
-        
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 20; border-radius: 20px; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 20; border-radius: 20px; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
         .overlay.active { opacity: 1; pointer-events: auto; }
+        
+        /* Effects */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
     </style>
 </head>
 <body>
     <div id="intro-screen">
         <div class="heart-loader">💖</div>
-        <h2 style="color: white; font-weight: normal;">Для моєї Манюньки...</h2>
+        <h2 style="color: white; font-weight: normal;">Завантаження фізики...</h2>
     </div>
 
     <div id="app">
         <div id="screen-menu" class="screen">
-            <h1>Ігрова Кімната</h1>
-            <p style="margin-bottom: 20px; color: #aaa;">Обери гру, щоб розважитись!</p>
-            <button class="btn" onclick="App.open('flappy')">🕊️ Flappy Heart 💖</button>
-            <button class="btn" onclick="App.open('helix')">🌀 Спіраль (Helix) 🌀</button>
-            <button class="btn" onclick="App.open('match3')">💎 Три в ряд 🍬</button>
-            <button class="btn" onclick="App.open('ttt')">❌ Хрестики-Нулики ⭕</button>
+            <h1 style="font-size: 36px; margin-bottom: 5px;">Ігрова Кімната</h1>
+            <p style="margin-bottom: 30px; color: #aaa;">Для моєї коханої Манюньки 💖</p>
+            <button class="btn" onclick="App.open('flappy')">🕊️ Flappy Heart</button>
+            <button class="btn" onclick="App.open('helix')">🌀 Спіраль (Helix)</button>
+            <button class="btn" onclick="App.open('match3')">💎 Три в ряд</button>
+            <button class="btn" onclick="App.open('ttt')">❌ Хрестики-Нулики</button>
         </div>
 
         <div id="screen-ttt" class="screen">
@@ -91,44 +93,92 @@
                 <button class="diff-btn" onclick="TTT.setDiff(2, this)">Середньо</button>
                 <button class="diff-btn" onclick="TTT.setDiff(3, this)">Неможливо</button>
             </div>
-            <div id="ttt-msg" style="margin-bottom: 15px; font-size: 18px; min-height: 20px;">Твій хід!</div>
+            <div id="ttt-msg" style="margin-bottom: 15px; font-size: 18px; min-height: 20px; color: #ff4d6d; text-shadow: 0 0 8px #ff4d6d;">Твій хід!</div>
             <div id="ttt-grid" class="ttt-grid"></div>
             <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
 
         <div id="screen-match3" class="screen">
             <h2 class="header">Збери пару!</h2>
-            <div id="match3-score" style="margin-bottom: 10px; font-size: 20px;">Рахунок: 0</div>
+            <div class="hud" style="top: 60px; position: relative;">
+                <span style="color: white;">Рахунок: <span id="match3-score" style="color: var(--accent);">0</span></span>
+            </div>
             <div id="match3-board"></div>
+            <p style="color: #888; font-size: 12px; margin-top: 15px;">Свайпай діаманти, щоб міняти їх місцями!</p>
             <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
 
         <div id="screen-helix" class="screen">
-            <h2 class="header">Стрибай!</h2>
-            <div class="canvas-container glass">
-                <div id="helix-score" class="score-display">0</div>
-                <canvas id="helix-canvas"></canvas>
+            <div class="hud">
+                <span>🏆 <span id="helix-score">0</span></span>
+                <span class="lives" id="helix-lives">💖💖💖</span>
             </div>
-            <div style="margin-top: 15px; color: #aaa; font-size: 12px; text-align: center;">Тягни вліво/вправо, щоб крутити башню</div>
+            <div class="canvas-container glass">
+                <canvas id="helix-canvas"></canvas>
+                <div id="helix-overlay" class="overlay">
+                    <h2 style="font-size: 32px; margin-bottom: 10px;">Гру закінчено💔</h2>
+                    <p style="color: white; font-size: 20px; margin-bottom: 15px;">Рахунок: <span id="helix-final-score" style="color: var(--accent); font-weight: bold;">0</span></p>
+                    <button class="btn" style="width: auto; padding: 12px 25px;" onclick="Helix.start()">Спробувати ще</button>
+                </div>
+            </div>
+            <p style="color: #888; font-size: 12px; margin-top: 15px;">Свайпай по екрану для обертання</p>
             <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
 
         <div id="screen-flappy" class="screen">
-            <h2 class="header">Лети!</h2>
+            <div class="hud">
+                <span>🏆 <span id="flappy-score">0</span></span>
+            </div>
             <div class="canvas-container glass">
-                <div id="flappy-score" class="score-display">0</div>
                 <canvas id="flappy-canvas"></canvas>
                 <div id="flappy-overlay" class="overlay">
-                    <h2 style="margin-bottom: 10px;">Кінець гри!</h2>
-                    <button class="btn" style="width: auto; padding: 10px 20px; margin-bottom: 10px;" onclick="Flappy.start()">Грати ще</button>
+                    <h2 style="font-size: 32px; margin-bottom: 10px;">Впала! 💔</h2>
+                    <p style="color: white; font-size: 20px; margin-bottom: 15px;">Рахунок: <span id="flappy-final-score" style="color: var(--accent); font-weight: bold;">0</span></p>
+                    <button class="btn" style="width: auto; padding: 12px 25px;" onclick="Flappy.start()">Летіти знову</button>
                 </div>
             </div>
-            <div style="margin-top: 15px; color: #aaa; font-size: 12px; text-align: center;">Тапай по екрану, щоб серце летіло</div>
+            <p style="color: #888; font-size: 12px; margin-top: 15px;">Тапай, щоб підстрибнути</p>
             <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
     </div>
 
     <script>
+        // --- СИСТЕМА ЧАСТИНОК (ФІЗИКА) ---
+        class ParticleSystem {
+            constructor() { this.particles = []; }
+            burst(x, y, color, count, speed) {
+                for(let i=0; i<count; i++) {
+                    let angle = Math.random() * Math.PI * 2;
+                    let velocity = Math.random() * speed;
+                    this.particles.push({
+                        x: x, y: y,
+                        vx: Math.cos(angle) * velocity,
+                        vy: Math.sin(angle) * velocity - 2, // Невеликий імпульс вгору
+                        life: 1, decay: Math.random() * 0.03 + 0.02,
+                        size: Math.random() * 6 + 2, color: color
+                    });
+                }
+            }
+            updateAndDraw(ctx, gravity = 0.2) {
+                for(let i=this.particles.length-1; i>=0; i--) {
+                    let p = this.particles[i];
+                    p.vy += gravity; // Гравітація для частинок
+                    p.x += p.vx; p.y += p.vy;
+                    p.life -= p.decay;
+                    
+                    if(p.life <= 0) { this.particles.splice(i, 1); continue; }
+                    
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    // Малюємо зірочки або осколки
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+        }
+
         // --- ГОЛОВНИЙ КОНТРОЛЕР ---
         const App = {
             init() {
@@ -136,14 +186,19 @@
                     document.getElementById('intro-screen').style.display = 'none';
                     document.getElementById('app').style.display = 'block';
                     this.open('menu');
-                }, 2000); 
+                }, 1500); 
+            },
+            shake() {
+                const appElem = document.getElementById('app');
+                appElem.classList.remove('shake');
+                void appElem.offsetWidth; // trigger reflow
+                appElem.classList.add('shake');
             },
             open(id) {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('screen-' + id).classList.add('active');
                 
-                Helix.stop();
-                Flappy.stop();
+                Helix.stop(); Flappy.stop();
 
                 if (id === 'ttt') TTT.init();
                 if (id === 'match3') Match3.init();
@@ -158,7 +213,7 @@
             init() {
                 this.board = Array(9).fill(null);
                 this.gameOver = false;
-                document.getElementById('ttt-msg').innerText = "Твій хід (Х)!";
+                document.getElementById('ttt-msg').innerText = "Твій хід (💖)!";
                 this.render();
             },
             setDiff(level, btn) {
@@ -175,8 +230,10 @@
                     cell.className = 'ttt-cell glass';
                     if (this.board[i]) {
                         cell.innerText = this.board[i] === 'X' ? '💖' : '⭕';
-                        cell.classList.add(this.board[i].toLowerCase());
-                    }
+                        cell.style.color = this.board[i] === 'X' ? 'var(--accent)' : '#4dabf7';
+                        cell.style.textShadow = `0 0 15px ${this.board[i] === 'X' ? 'var(--accent)' : '#4dabf7'}`;
+                        cell.style.transform = "scale(1)";
+                    } else { cell.style.transform = "scale(0.8)"; }
                     cell.onclick = () => this.makeMove(i);
                     grid.appendChild(cell);
                 }
@@ -185,12 +242,12 @@
                 if (this.board[idx] || this.gameOver) return;
                 this.board[idx] = this.player;
                 this.render();
-                if (this.checkWin(this.player)) return this.end("Ти перемогла! 💖");
+                if (this.checkWin(this.player)) return this.end("Ти перемогла! 💖✨");
                 if (this.board.every(c => c)) return this.end("Нічия! 🤝");
                 
                 this.gameOver = true;
                 document.getElementById('ttt-msg').innerText = "Думаю...";
-                setTimeout(() => this.aiMove(), 500);
+                setTimeout(() => this.aiMove(), 600);
             },
             aiMove() {
                 let move;
@@ -200,7 +257,7 @@
 
                 this.board[move] = this.ai;
                 this.render();
-                if (this.checkWin(this.ai)) return this.end("Я переміг! 😈");
+                if (this.checkWin(this.ai)) { App.shake(); return this.end("Я переміг! 😈"); }
                 if (this.board.every(c => c)) return this.end("Нічия! 🤝");
                 
                 this.gameOver = false;
@@ -211,7 +268,7 @@
                 return empty[Math.floor(Math.random() * empty.length)];
             },
             getBestMove() {
-                let bestScore = -Infinity, move;
+                let bestScore = -Infinity, move = this.getRandomMove();
                 for(let i=0; i<9; i++) {
                     if(!this.board[i]) {
                         this.board[i] = this.ai;
@@ -220,7 +277,7 @@
                         if(score > bestScore) { bestScore = score; move = i; }
                     }
                 }
-                return move !== undefined ? move : this.getRandomMove();
+                return move;
             },
             minimax(board, depth, isMaximizing) {
                 if (this.checkWin(this.ai)) return 10 - depth;
@@ -251,7 +308,7 @@
             },
             checkWin(p) {
                 const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-                return wins.some(w => board = this.board[w[0]] === p && this.board[w[1]] === p && this.board[w[2]] === p);
+                return wins.some(w => this.board[w[0]] === p && this.board[w[1]] === p && this.board[w[2]] === p);
             },
             end(msg) {
                 this.gameOver = true;
@@ -260,25 +317,32 @@
             }
         };
 
-        // --- ГРА 2: ТРИ В РЯД ---
+        // --- ГРА 2: ТРИ В РЯД (ЗІ СВАЙПАМИ ТА АНІМАЦІЯМИ) ---
         const Match3 = {
             cols: 6, rows: 6, grid: [], score: 0,
             emojis: ['💖', '🌸', '🎀', '🍬', '💎', '🍓'],
-            selected: null,
+            selected: null, startX: 0, startY: 0, isSwiping: false,
+            
             init() {
-                this.score = 0;
-                this.updateScore();
+                this.score = 0; this.updateScore();
                 const board = document.getElementById('match3-board');
                 board.style.gridTemplateColumns = `repeat(${this.cols}, 45px)`;
-                this.grid = [];
+                this.grid = Array.from({length: this.rows}, () => Array(this.cols).fill(null));
+                this.fillBoard();
+                
+                // Глобальні обробники свайпів для дошки
+                board.addEventListener('touchstart', (e) => this.touchStart(e), {passive: false});
+                board.addEventListener('touchmove', (e) => this.touchMove(e), {passive: false});
+                board.addEventListener('touchend', (e) => this.touchEnd(e), {passive: false});
+            },
+            fillBoard() {
                 for(let r=0; r<this.rows; r++) {
-                    this.grid[r] = [];
                     for(let c=0; c<this.cols; c++) {
-                        this.grid[r][c] = this.randomGem();
+                        if(!this.grid[r][c]) this.grid[r][c] = this.randomGem();
                     }
                 }
                 this.render();
-                this.checkMatches(); 
+                if(this.findMatches().length > 0) setTimeout(() => this.checkMatches(), 300);
             },
             randomGem() { return this.emojis[Math.floor(Math.random() * this.emojis.length)]; },
             render() {
@@ -288,71 +352,120 @@
                     for(let c=0; c<this.cols; c++) {
                         let cell = document.createElement('div');
                         cell.className = 'gem';
-                        cell.innerText = this.grid[r][c];
+                        cell.dataset.r = r; cell.dataset.c = c;
+                        cell.innerText = this.grid[r][c] || '';
                         if(this.selected && this.selected.r === r && this.selected.c === c) cell.classList.add('selected');
-                        cell.onclick = () => this.clickGem(r, c);
+                        
+                        // Клік мишкою для ПК
+                        cell.onmousedown = () => this.clickGem(r, c);
                         board.appendChild(cell);
                     }
                 }
             },
-            clickGem(r, c) {
-                if (!this.selected) {
-                    this.selected = {r, c};
+            // Логіка свайпів
+            touchStart(e) {
+                if(e.target.classList.contains('gem')) {
+                    this.isSwiping = true;
+                    let touch = e.touches[0];
+                    this.startX = touch.clientX; this.startY = touch.clientY;
+                    this.selected = {r: parseInt(e.target.dataset.r), c: parseInt(e.target.dataset.c)};
                     this.render();
-                } else {
-                    let dr = Math.abs(this.selected.r - r);
-                    let dc = Math.abs(this.selected.c - c);
-                    if ((dr === 1 && dc === 0) || (dr === 0 && dc === 1)) {
-                        let temp = this.grid[r][c];
-                        this.grid[r][c] = this.grid[this.selected.r][this.selected.c];
-                        this.grid[this.selected.r][this.selected.c] = temp;
-                        
-                        let matches = this.findMatches();
-                        if (matches.length > 0) {
-                            this.selected = null;
-                            this.processMatches(matches);
-                        } else {
-                            let temp2 = this.grid[r][c];
-                            this.grid[r][c] = this.grid[this.selected.r][this.selected.c];
-                            this.grid[this.selected.r][this.selected.c] = temp2;
+                }
+            },
+            touchMove(e) {
+                if(!this.isSwiping || !this.selected) return;
+                e.preventDefault(); // Зупиняє скрол сторінки
+                let touch = e.touches[0];
+                let dx = touch.clientX - this.startX;
+                let dy = touch.clientY - this.startY;
+                
+                if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+                    this.isSwiping = false;
+                    let targetR = this.selected.r; let targetC = this.selected.c;
+                    
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        targetC += dx > 0 ? 1 : -1;
+                    } else {
+                        targetR += dy > 0 ? 1 : -1;
+                    }
+                    
+                    if (targetR >= 0 && targetR < this.rows && targetC >= 0 && targetC < this.cols) {
+                        this.attemptSwap(this.selected.r, this.selected.c, targetR, targetC);
+                    } else {
+                        this.selected = null; this.render();
+                    }
+                }
+            },
+            touchEnd() { this.isSwiping = false; },
+            
+            clickGem(r, c) {
+                if (!this.selected) { this.selected = {r, c}; this.render(); }
+                else { this.attemptSwap(this.selected.r, this.selected.c, r, c); }
+            },
+            attemptSwap(r1, c1, r2, c2) {
+                let dr = Math.abs(r1 - r2); let dc = Math.abs(c1 - c2);
+                if ((dr === 1 && dc === 0) || (dr === 0 && dc === 1)) {
+                    // Міняємо
+                    let temp = this.grid[r2][c2];
+                    this.grid[r2][c2] = this.grid[r1][c1];
+                    this.grid[r1][c1] = temp;
+                    
+                    if (this.findMatches().length > 0) {
+                        this.selected = null;
+                        this.render();
+                        setTimeout(() => this.checkMatches(), 200);
+                    } else {
+                        // Повертаємо назад, якщо нема співпадінь
+                        setTimeout(() => {
+                            let t = this.grid[r2][c2];
+                            this.grid[r2][c2] = this.grid[r1][c1];
+                            this.grid[r1][c1] = t;
                             this.selected = null;
                             this.render();
-                        }
-                    } else {
-                        this.selected = {r, c};
-                        this.render();
+                        }, 300);
                     }
+                } else {
+                    this.selected = {r: r2, c: c2}; this.render();
                 }
             },
             findMatches() {
                 let matches = [];
+                // Горизонтальні
                 for(let r=0; r<this.rows; r++) {
                     for(let c=0; c<this.cols-2; c++) {
-                        if(this.grid[r][c] === this.grid[r][c+1] && this.grid[r][c] === this.grid[r][c+2]) {
+                        if(this.grid[r][c] && this.grid[r][c] === this.grid[r][c+1] && this.grid[r][c] === this.grid[r][c+2]) {
                             matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
                         }
                     }
                 }
+                // Вертикальні
                 for(let c=0; c<this.cols; c++) {
                     for(let r=0; r<this.rows-2; r++) {
-                        if(this.grid[r][c] === this.grid[r+1][c] && this.grid[r][c] === this.grid[r+2][c]) {
+                        if(this.grid[r][c] && this.grid[r][c] === this.grid[r+1][c] && this.grid[r][c] === this.grid[r+2][c]) {
                             matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
                         }
                     }
                 }
-                return matches;
+                // Прибираємо дублікати
+                return matches.filter((v,i,a)=>a.findIndex(t=>(t.r===v.r && t.c===v.c))===i);
             },
-            processMatches(matches) {
-                matches.forEach(m => {
-                    if(this.grid[m.r][m.c] !== null) {
+            checkMatches() {
+                let matches = this.findMatches();
+                if(matches.length > 0) {
+                    // Анімація зникнення
+                    const cells = document.querySelectorAll('.gem');
+                    matches.forEach(m => {
+                        let idx = m.r * this.cols + m.c;
+                        if(cells[idx]) cells[idx].classList.add('popping');
                         this.grid[m.r][m.c] = null;
-                        this.score += 10;
-                    }
-                });
-                this.updateScore();
-                this.render();
-                
-                setTimeout(() => this.applyGravity(), 300);
+                        this.score += 15;
+                    });
+                    this.updateScore();
+                    
+                    setTimeout(() => {
+                        this.applyGravity();
+                    }, 300);
+                }
             },
             applyGravity() {
                 for(let c=0; c<this.cols; c++) {
@@ -368,29 +481,18 @@
                         }
                     }
                 }
-                for(let c=0; c<this.cols; c++) {
-                    for(let r=0; r<this.rows; r++) {
-                        if(this.grid[r][c] === null) this.grid[r][c] = this.randomGem();
-                    }
-                }
-                this.render();
-                this.checkMatches();
+                this.fillBoard();
             },
-            checkMatches() {
-                let matches = this.findMatches();
-                if(matches.length > 0) setTimeout(() => this.processMatches(matches), 400);
-            },
-            updateScore() { document.getElementById('match3-score').innerText = `Рахунок: ${this.score}`; }
+            updateScore() { document.getElementById('match3-score').innerText = this.score; }
         };
 
-        // --- ГРА 3: HELIX JUMP (З Сердечком) ---
+        // --- ГРА 3: HELIX JUMP 2.5D (РУЙНУВАННЯ + ФІЗИКА + СКЛАДНІСТЬ) ---
         const Helix = {
-            canvas: null, ctx: null, raf: null,
-            w: 0, h: 0,
-            rotation: 0, targetRotation: 0,
-            ball: { y: 50, vy: 0, radius: 12 }, 
-            platforms: [], score: 0, state: 'play',
-            isDragging: false, lastX: 0,
+            canvas: null, ctx: null, raf: null, ps: new ParticleSystem(),
+            w: 0, h: 0, rotation: 0, targetRotation: 0,
+            ball: { y: 100, vy: 0, radius: 14, isInvincible: false }, 
+            platforms: [], score: 0, lives: 3, state: 'stopped',
+            isDragging: false, lastX: 0, difficultyTimer: 0,
             
             init() {
                 this.canvas = document.getElementById('helix-canvas');
@@ -399,42 +501,60 @@
                 this.w = this.canvas.width = rect.width;
                 this.h = this.canvas.height = rect.height;
                 
-                this.score = 0;
-                this.rotation = 0;
-                this.targetRotation = 0;
-                this.ball = { y: 50, vy: 0, radius: 12 };
-                this.state = 'play';
+                this.canvas.addEventListener('touchstart', (e) => { this.isDragging = true; this.lastX = e.touches[0].clientX; }, {passive: false});
+                this.canvas.addEventListener('touchmove', (e) => {
+                    if(!this.isDragging || this.state !== 'play') return;
+                    e.preventDefault();
+                    let dx = e.touches[0].clientX - this.lastX;
+                    this.targetRotation += dx * 0.025; 
+                    this.lastX = e.touches[0].clientX;
+                }, {passive: false});
+                this.canvas.addEventListener('touchend', () => { this.isDragging = false; });
                 
-                this.generatePlatforms();
-                
+                // Для мишки (ПК)
                 this.canvas.onpointerdown = (e) => { this.isDragging = true; this.lastX = e.clientX; };
                 this.canvas.onpointermove = (e) => {
                     if(!this.isDragging || this.state !== 'play') return;
                     let dx = e.clientX - this.lastX;
-                    this.targetRotation += dx * 0.02;
+                    this.targetRotation += dx * 0.025;
                     this.lastX = e.clientX;
                 };
                 this.canvas.onpointerup = () => { this.isDragging = false; };
-                this.canvas.onpointerleave = () => { this.isDragging = false; };
+                
+                this.start();
+            },
+            updateLivesUI() {
+                document.getElementById('helix-lives').innerText = '💖'.repeat(this.lives);
+            },
+            start() {
+                document.getElementById('helix-overlay').classList.remove('active');
+                this.score = 0; this.lives = 3; this.difficultyTimer = 0;
+                this.rotation = 0; this.targetRotation = 0;
+                this.ball = { y: 120, vy: 0, radius: 14, isInvincible: false };
+                this.state = 'play';
+                this.ps.particles = [];
+                this.updateLivesUI();
+                
+                this.platforms = [];
+                for(let i=0; i<15; i++) this.addPlatform(200 + i * 140, i);
                 
                 document.getElementById('helix-score').innerText = this.score;
                 this.loop();
             },
             stop() { if(this.raf) cancelAnimationFrame(this.raf); this.state = 'stopped'; },
-            generatePlatforms() {
-                this.platforms = [];
-                for(let i=0; i<15; i++) {
-                    let gapStart = Math.random() * Math.PI * 2;
-                    let gapSize = Math.PI / 2.2; 
-                    this.platforms.push({
-                        y: 150 + i * 120,
-                        gapStart: gapStart,
-                        gapEnd: gapStart + gapSize,
-                        passed: false,
-                        color: i % 4 === 0 ? '#ff4d6d' : '#ffffff' 
-                    });
-                }
+            
+            addPlatform(y, index) {
+                let diffMulti = Math.min(1.5, 1 + this.score * 0.02); // Ускладнення
+                let gapStart = Math.random() * Math.PI * 2;
+                let gapSize = Math.max(Math.PI / 3, (Math.PI / 2) - (this.score * 0.02)); // Дірка меншає
+                let isRed = index > 1 && Math.random() < Math.min(0.7, 0.2 + this.score * 0.05); // Більше червоних платформ
+                
+                this.platforms.push({
+                    id: Math.random(), y: y, gapStart: gapStart, gapEnd: gapStart + gapSize,
+                    color: isRed ? '#ff4d6d' : '#ffffff', passed: false
+                });
             },
+            
             loop() {
                 if (this.state !== 'play') return;
                 this.update();
@@ -442,209 +562,312 @@
                 this.raf = requestAnimationFrame(() => this.loop());
             },
             update() {
-                this.rotation += (this.targetRotation - this.rotation) * 0.2;
+                this.rotation += (this.targetRotation - this.rotation) * 0.2; // Інерція
                 
-                this.ball.vy += 0.4; // гравітація
+                // Динамічна гравітація
+                let gravity = 0.4 + Math.min(0.3, this.score * 0.01);
+                this.ball.vy += gravity; 
                 this.ball.y += this.ball.vy;
                 
-                if(this.ball.y > this.h / 2.5) {
-                    let diff = this.ball.y - this.h / 2.5;
-                    this.ball.y = this.h / 2.5;
+                // Камера
+                let targetCamY = this.h * 0.35;
+                if(this.ball.y > targetCamY) {
+                    let diff = this.ball.y - targetCamY;
+                    this.ball.y = targetCamY;
                     this.platforms.forEach(p => p.y -= diff);
+                    this.ps.particles.forEach(p => p.y -= diff);
                 }
 
+                const inGap = (a, start, end) => {
+                    a = (a % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    start = (start % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    end = (end % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    return start < end ? (a >= start && a <= end) : (a >= start || a <= end);
+                };
+
+                // Колізії
                 for(let i=0; i<this.platforms.length; i++) {
                     let p = this.platforms[i];
-                    if(this.ball.y + this.ball.radius >= p.y && this.ball.y - this.ball.vy < p.y) {
-                        
-                        let ballAngle = (-this.rotation % (Math.PI * 2));
-                        if(ballAngle < 0) ballAngle += Math.PI * 2;
-                        
-                        let inGap = false;
-                        let gs = p.gapStart, ge = p.gapEnd;
-                        
-                        if(ge > Math.PI*2) inGap = (ballAngle > gs || ballAngle < (ge - Math.PI*2));
-                        else inGap = (ballAngle > gs && ballAngle < ge);
+                    let hitY = p.y + 10; 
 
-                        if(inGap) {
-                            if(!p.passed) { p.passed = true; this.score++; document.getElementById('helix-score').innerText = this.score; }
+                    if(this.ball.y + this.ball.radius >= hitY && this.ball.y - this.ball.vy <= hitY) {
+                        let checkAngle = Math.PI / 2 - this.rotation;
+
+                        if(inGap(checkAngle, p.gapStart, p.gapEnd)) {
+                            // ПРОБИВАННЯ ПЛАТФОРМИ!
+                            if(!p.passed) { 
+                                p.passed = true; 
+                                this.score++; 
+                                document.getElementById('helix-score').innerText = this.score;
+                                
+                                // Руйнування платформи (ефект осколків)
+                                this.ps.burst(this.w/2, p.y, p.color === '#ff4d6d' ? '#ff4d6d' : '#ddd', 20, 8);
+                                
+                                // Видаляємо платформу
+                                this.platforms.splice(i, 1);
+                                i--; 
+                                
+                                // Відразу додаємо нову знизу
+                                let lastY = this.platforms[this.platforms.length-1].y;
+                                this.addPlatform(lastY + 140, this.score + 15);
+                            }
                         } else {
-                            this.ball.y = p.y - this.ball.radius;
-                            this.ball.vy = -7.5; // відскок
+                            // ПРИЗЕМЛЕННЯ
+                            if (p.color === '#ff4d6d' && !this.ball.isInvincible) {
+                                // Шкода
+                                this.lives--;
+                                this.updateLivesUI();
+                                App.shake(); // Трясемо екран
+                                this.ps.burst(this.w/2, this.ball.y, '#ff4d6d', 30, 10);
+                                
+                                if (this.lives <= 0) {
+                                    this.gameOver();
+                                    return;
+                                } else {
+                                    // Невразливість і сильний відскок
+                                    this.ball.isInvincible = true;
+                                    setTimeout(() => { this.ball.isInvincible = false; }, 1500);
+                                    this.ball.y = hitY - this.ball.radius;
+                                    this.ball.vy = -12; 
+                                }
+                            } else {
+                                // Звичайний відскок
+                                this.ball.y = hitY - this.ball.radius;
+                                this.ball.vy = -8.5 - Math.min(2, this.score * 0.05); 
+                                // Маленькі частинки пилу при ударі
+                                this.ps.burst(this.w/2, hitY, '#ffffff', 5, 3);
+                            }
                         }
                     }
                 }
                 
-                if(this.platforms[0] && this.platforms[0].y < -50) {
+                // Видалення старих платформ позаду
+                if(this.platforms[0] && this.platforms[0].y < -100) {
                     this.platforms.shift();
                     let lastY = this.platforms[this.platforms.length-1].y;
-                    let gapStart = Math.random() * Math.PI * 2;
-                    this.platforms.push({
-                        y: lastY + 120, gapStart: gapStart, gapEnd: gapStart + Math.PI / 2.2, passed: false, color: Math.random() > 0.7 ? '#ff4d6d' : '#ffffff'
-                    });
+                    this.addPlatform(lastY + 140, this.score + 15);
                 }
             },
             draw() {
-                this.ctx.clearRect(0,0,this.w,this.h);
-                
-                this.ctx.fillStyle = '#222';
-                this.ctx.fillRect(this.w/2 - 15, 0, 30, this.h);
+                this.ctx.clearRect(0, 0, this.w, this.h);
+                let cx = this.w / 2; let R = 90; let thickness = 12; let steps = 30;
 
-                for(let i=0; i<this.platforms.length; i++) {
+                const inGap = (a, start, end) => {
+                    a = (a % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    start = (start % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    end = (end % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    return start < end ? (a >= start && a <= end) : (a >= start || a <= end);
+                };
+
+                // Задній шар платформ
+                for (let i = 0; i < this.platforms.length; i++) {
                     let p = this.platforms[i];
-                    if(p.y < 0 || p.y > this.h + 50) continue;
+                    for (let j = 0; j < steps; j++) {
+                        let a1 = (j / steps) * Math.PI * 2, a2 = ((j + 1) / steps) * Math.PI * 2;
+                        if (inGap((a1 + a2) / 2, p.gapStart, p.gapEnd)) continue;
+                        let wA1 = a1 + this.rotation, wA2 = a2 + this.rotation;
+                        if (Math.sin((wA1 + wA2) / 2) > 0) continue;
 
-                    this.ctx.save();
-                    this.ctx.translate(this.w/2, p.y);
-                    this.ctx.rotate(this.rotation);
-                    
-                    this.ctx.beginPath();
-                    this.ctx.arc(0, 0, 70, p.gapEnd, p.gapStart + Math.PI*2);
-                    this.ctx.lineTo(0,0);
-                    this.ctx.fillStyle = p.color === '#ff4d6d' ? 'rgba(255, 77, 109, 0.8)' : 'rgba(255,255,255,0.8)';
-                    this.ctx.fill();
-                    
-                    this.ctx.lineWidth = 3;
-                    this.ctx.strokeStyle = p.color === '#ff4d6d' ? '#c92a47' : '#cccccc';
-                    this.ctx.stroke();
-                    this.ctx.restore();
+                        let x1 = cx + R * Math.cos(wA1), y1 = p.y + 15 * Math.sin(wA1);
+                        let x2 = cx + R * Math.cos(wA2), y2 = p.y + 15 * Math.sin(wA2);
+
+                        this.ctx.fillStyle = p.color === '#ff4d6d' ? '#8a172b' : '#555';
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x1, y1); this.ctx.lineTo(x2, y2);
+                        this.ctx.lineTo(x2, y2 + thickness); this.ctx.lineTo(x1, y1 + thickness);
+                        this.ctx.fill();
+                    }
                 }
 
-                // Малюємо Сердечко замість шарика
-                let bx = this.w/2;
-                let by = this.ball.y - Math.sin(this.rotation)*10;
+                // Стовп
+                let pillarGrad = this.ctx.createLinearGradient(cx - 20, 0, cx + 20, 0);
+                pillarGrad.addColorStop(0, '#111'); pillarGrad.addColorStop(0.5, '#333'); pillarGrad.addColorStop(1, '#000');
+                this.ctx.fillStyle = pillarGrad;
+                this.ctx.fillRect(cx - 20, 0, 40, this.h);
+
+                // Передній шар
+                for (let i = 0; i < this.platforms.length; i++) {
+                    let p = this.platforms[i];
+                    for (let j = 0; j < steps; j++) {
+                        let a1 = (j / steps) * Math.PI * 2, a2 = ((j + 1) / steps) * Math.PI * 2;
+                        if (inGap((a1 + a2) / 2, p.gapStart, p.gapEnd)) continue;
+                        let wA1 = a1 + this.rotation, wA2 = a2 + this.rotation;
+                        if (Math.sin((wA1 + wA2) / 2) <= 0) continue;
+
+                        let x1 = cx + R * Math.cos(wA1), y1 = p.y + 15 * Math.sin(wA1);
+                        let x2 = cx + R * Math.cos(wA2), y2 = p.y + 15 * Math.sin(wA2);
+
+                        this.ctx.fillStyle = p.color; 
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x1, y1); this.ctx.lineTo(x2, y2);
+                        this.ctx.lineTo(x2, y2 + thickness); this.ctx.lineTo(x1, y1 + thickness);
+                        this.ctx.fill();
+                        
+                        // Відблиск
+                        this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                        this.ctx.lineWidth = 1.5;
+                        this.ctx.beginPath(); this.ctx.moveTo(x1, y1); this.ctx.lineTo(x2, y2); this.ctx.stroke();
+                    }
+                }
+
+                // Частинки
+                this.ps.updateAndDraw(this.ctx);
+
+                // Герой (Сердечко)
+                this.ctx.save();
+                this.ctx.font = "32px Arial";
+                this.ctx.textAlign = "center"; this.ctx.textBaseline = "middle";
+                if(this.ball.isInvincible && Math.floor(Date.now() / 100) % 2 === 0) this.ctx.globalAlpha = 0.5; // Блимання при невразливості
+                this.ctx.shadowBlur = 20; this.ctx.shadowColor = '#ff4d6d';
                 
-                this.ctx.font = "28px Arial";
-                this.ctx.textAlign = "center";
-                this.ctx.textBaseline = "middle";
-                this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = '#ff4d6d';
-                this.ctx.fillText("💖", bx, by);
-                this.ctx.shadowBlur = 0;
+                // Стиснення при падінні
+                let stretch = Math.max(0.5, 1 - this.ball.vy * 0.02);
+                this.ctx.translate(cx, this.ball.y);
+                this.ctx.scale(1/stretch, stretch);
+                this.ctx.fillText("💖", 0, 0);
+                this.ctx.restore();
+            },
+            gameOver() {
+                this.state = 'stopped';
+                App.shake();
+                document.getElementById('helix-final-score').innerText = this.score;
+                document.getElementById('helix-overlay').classList.add('active');
             }
         };
 
-        // --- ГРА 4: FLAPPY HEART ---
+        // --- ГРА 4: FLAPPY HEART (ДИНАМІКА + ЧАСТИНКИ) ---
         const Flappy = {
-            canvas: null, ctx: null, raf: null,
-            w: 0, h: 0,
-            bird: { x: 50, y: 0, vy: 0, radius: 15 },
+            canvas: null, ctx: null, raf: null, ps: new ParticleSystem(),
+            w: 0, h: 0, bird: { x: 50, y: 0, vy: 0, radius: 15 },
             pipes: [], score: 0, frames: 0, state: 'stopped',
 
             init() {
                 this.canvas = document.getElementById('flappy-canvas');
                 this.ctx = this.canvas.getContext('2d');
                 let rect = this.canvas.parentElement.getBoundingClientRect();
-                this.w = this.canvas.width = rect.width;
-                this.h = this.canvas.height = rect.height;
+                this.w = this.canvas.width = rect.width; this.h = this.canvas.height = rect.height;
                 
-                document.getElementById('flappy-overlay').classList.remove('active');
-                
+                this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.jump(); }, {passive: false});
                 this.canvas.onpointerdown = () => this.jump();
+                
                 this.start();
             },
             start() {
                 document.getElementById('flappy-overlay').classList.remove('active');
                 this.bird = { x: this.w * 0.3, y: this.h / 2, vy: 0, radius: 15 };
-                this.pipes = [];
-                this.score = 0;
-                this.frames = 0;
-                this.state = 'play';
+                this.pipes = []; this.ps.particles = [];
+                this.score = 0; this.frames = 0; this.state = 'play';
                 document.getElementById('flappy-score').innerText = this.score;
                 this.loop();
             },
             stop() { if(this.raf) cancelAnimationFrame(this.raf); this.state = 'stopped'; },
             jump() {
-                if (this.state === 'play') this.bird.vy = -7;
+                if (this.state === 'play') {
+                    this.bird.vy = -7.5;
+                    this.ps.burst(this.bird.x, this.bird.y + 10, 'rgba(255, 77, 109, 0.6)', 10, 4); // Іскри при стрибку
+                }
             },
             loop() {
                 if (this.state !== 'play') return;
-                this.update();
-                this.draw();
+                this.update(); this.draw();
                 this.raf = requestAnimationFrame(() => this.loop());
             },
             update() {
                 this.frames++;
-                this.bird.vy += 0.4; // гравітація
+                this.bird.vy += 0.45; // Гравітація
                 this.bird.y += this.bird.vy;
-
-                // Генерація труб
-                if (this.frames % 90 === 0) {
-                    let gap = 160; // розмір дірки
-                    let topH = Math.random() * (this.h - gap - 60) + 30;
-                    this.pipes.push({ x: this.w, w: 50, topHeight: topH, gap: gap, passed: false });
+                
+                // Частинки - хвіст від серця
+                if(this.frames % 3 === 0) {
+                    this.ps.particles.push({
+                        x: this.bird.x - 15, y: this.bird.y,
+                        vx: -2, vy: 0, life: 1, decay: 0.05, size: 4, color: '#ff4d6d'
+                    });
                 }
 
-                // Логіка труб та зіткнень
+                // Складність росте
+                let speed = 3.5 + (this.score * 0.1); 
+                let pipeFreq = Math.max(50, 90 - (this.score * 2)); 
+                
+                if (this.frames % Math.floor(pipeFreq) === 0) {
+                    let gap = Math.max(120, 170 - (this.score * 2)); // Дірки меншають
+                    let topH = Math.random() * (this.h - gap - 80) + 40;
+                    this.pipes.push({ x: this.w, w: 55, topHeight: topH, gap: gap, passed: false });
+                }
+
                 for (let i = 0; i < this.pipes.length; i++) {
                     let p = this.pipes[i];
-                    p.x -= 3; // швидкість руху
+                    p.x -= speed; 
 
-                    // Зіткнення (AABB)
-                    if (this.bird.x + this.bird.radius > p.x && this.bird.x - this.bird.radius < p.x + p.w) {
-                        if (this.bird.y - this.bird.radius < p.topHeight || this.bird.y + this.bird.radius > p.topHeight + p.gap) {
+                    // Зіткнення
+                    let hitbox = 10;
+                    if (this.bird.x + hitbox > p.x && this.bird.x - hitbox < p.x + p.w) {
+                        if (this.bird.y - hitbox < p.topHeight || this.bird.y + hitbox > p.topHeight + p.gap) {
                             this.gameOver();
                         }
                     }
 
-                    // Рахунок
                     if (p.x + p.w < this.bird.x && !p.passed) {
                         p.passed = true;
                         this.score++;
                         document.getElementById('flappy-score').innerText = this.score;
+                        // Салют при проходженні труби
+                        this.ps.burst(this.bird.x, this.bird.y, '#ffd700', 15, 6);
                     }
                 }
 
-                // Видалення старих труб
-                if (this.pipes.length > 0 && this.pipes[0].x < -60) {
-                    this.pipes.shift();
-                }
-
-                // Зіткнення з підлогою/стелею
-                if (this.bird.y > this.h || this.bird.y < 0) {
-                    this.gameOver();
-                }
+                if (this.pipes.length > 0 && this.pipes[0].x < -100) this.pipes.shift();
+                if (this.bird.y > this.h || this.bird.y < -30) this.gameOver();
             },
             draw() {
                 this.ctx.clearRect(0,0,this.w,this.h);
 
-                // Труби (Glass стиль)
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                this.ctx.lineWidth = 2;
-
+                // Оновлений дизайн труб (Неоновий)
                 for (let i = 0; i < this.pipes.length; i++) {
                     let p = this.pipes[i];
-                    // Верхня
+                    let grad = this.ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
+                    grad.addColorStop(0, 'rgba(255, 77, 109, 0.2)');
+                    grad.addColorStop(0.5, 'rgba(255, 77, 109, 0.6)');
+                    grad.addColorStop(1, 'rgba(255, 77, 109, 0.2)');
+                    
+                    this.ctx.fillStyle = grad;
+                    this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#ff4d6d';
+                    
                     this.ctx.fillRect(p.x, 0, p.w, p.topHeight);
-                    this.ctx.strokeRect(p.x, 0, p.w, p.topHeight);
-                    // Нижня
                     this.ctx.fillRect(p.x, p.topHeight + p.gap, p.w, this.h - (p.topHeight + p.gap));
-                    this.ctx.strokeRect(p.x, p.topHeight + p.gap, p.w, this.h - (p.topHeight + p.gap));
+                    
+                    this.ctx.shadowBlur = 0;
+                    this.ctx.strokeStyle = '#fff'; this.ctx.lineWidth = 2;
+                    // Рамки для труб
+                    this.ctx.strokeRect(p.x, p.topHeight - 10, p.w, 10);
+                    this.ctx.strokeRect(p.x, p.topHeight + p.gap, p.w, 10);
                 }
 
-                // Малюємо Серце замість пташки
+                // Частинки
+                this.ps.updateAndDraw(this.ctx, 0);
+
+                // Пташка (Сердечко)
                 this.ctx.save();
                 this.ctx.translate(this.bird.x, this.bird.y);
-                // Повертаємо серце залежно від швидкості (як у Flappy Bird)
-                let angle = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (this.bird.vy * 0.1)));
+                let angle = Math.min(Math.PI / 3, Math.max(-Math.PI / 3, (this.bird.vy * 0.12)));
                 this.ctx.rotate(angle);
                 
-                this.ctx.font = "30px Arial";
-                this.ctx.textAlign = "center";
-                this.ctx.textBaseline = "middle";
-                this.ctx.shadowBlur = 10;
-                this.ctx.shadowColor = '#ff4d6d';
+                this.ctx.font = "34px Arial";
+                this.ctx.textAlign = "center"; this.ctx.textBaseline = "middle";
+                this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#ff4d6d';
                 this.ctx.fillText("💖", 0, 0);
                 this.ctx.restore();
             },
             gameOver() {
                 this.state = 'stopped';
+                App.shake();
+                this.ps.burst(this.bird.x, this.bird.y, '#ff4d6d', 50, 10);
+                this.draw(); // Малюємо останній кадр з вибухом
+                document.getElementById('flappy-final-score').innerText = this.score;
                 document.getElementById('flappy-overlay').classList.add('active');
             }
         };
 
-        // Запуск
         window.onload = () => App.init();
     </script>
 </body>
