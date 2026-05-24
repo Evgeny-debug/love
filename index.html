@@ -3,454 +3,648 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arcade Hub | Premium Full</title>
+    <title>Ігрова кімната моєї Манюньки</title>
     <style>
-        /* =========================================
-           [1. CSS VARIABLES & RESET]
-           ========================================= */
         :root {
             --bg: #050505;
-            --glass: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-hover: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --accent: #ff4d6d;
+            --accent-hover: #ff758f;
             --text: #ffffff;
-            --text-muted: #888888;
         }
         * { box-sizing: border-box; touch-action: manipulation; user-select: none; margin: 0; padding: 0; }
         body { 
-            background: var(--bg); color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; 
+            background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center;
         }
-
-        /* =========================================
-           [2. UI COMPONENTS (GLASSMORPHISM)]
-           ========================================= */
-        .glass { background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; position: absolute; opacity: 0; transition: opacity 0.3s ease; }
-        .screen.active { display: flex; opacity: 1; z-index: 10; }
         
+        /* Glassmorphism UI */
+        .glass { background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); }
         .btn { 
-            padding: 16px 32px; border: 1px solid var(--glass-border); border-radius: 14px; 
-            background: var(--glass); color: white; cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            margin: 10px; font-weight: 600; font-size: 16px; letter-spacing: 0.5px;
+            padding: 15px 30px; border: 1px solid var(--glass-border); border-radius: 15px; 
+            background: var(--glass); color: white; cursor: pointer; margin: 8px; width: 85%; max-width: 300px;
+            font-size: 18px; font-weight: bold; transition: 0.3s;
         }
-        .btn:hover { background: var(--glass-hover); transform: translateY(-3px); }
-        .btn:active { transform: scale(0.95); }
+        .btn:active { background: var(--accent); transform: scale(0.95); }
         
-        .stats-panel { display: flex; gap: 20px; margin-bottom: 30px; font-size: 14px; color: var(--text-muted); }
-        .stats-panel span { color: var(--accent); font-weight: bold; }
+        /* Screens */
+        #intro-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .heart-loader { color: var(--accent); font-size: 50px; animation: pulse 1s infinite alternate; margin-bottom: 20px; }
+        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+        
+        #app { width: 100%; max-width: 450px; height: 100%; position: relative; display: none; background: radial-gradient(circle at top right, #2b0b12, #050505); }
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; position: absolute; }
+        .screen.active { display: flex; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* =========================================
-           [3. PARTICLE SYSTEM (TIKTOK HEARTS)]
-           ========================================= */
-        .particle { position: absolute; pointer-events: none; z-index: 9999; animation: floatUp 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; fill: var(--accent); }
-        @keyframes floatUp { 
-            0% { transform: scale(0) translateY(0) rotate(-10deg); opacity: 1; } 
-            50% { transform: scale(1.2) translateY(-60px) rotate(10deg); opacity: 0.8; }
-            100% { transform: scale(0.5) translateY(-120px) rotate(-10deg); opacity: 0; } 
-        }
+        h1, h2 { color: var(--accent); margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(255,77,109,0.5); }
+        .header { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; pointer-events: none; }
+        .back-btn { position: absolute; bottom: 30px; z-index: 100; }
 
-        /* =========================================
-           [4. TIC TAC TOE STYLES]
-           ========================================= */
-        .ttt-wrapper { padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 12px; margin-bottom: 20px; }
-        .cell { 
+        /* Tic Tac Toe */
+        .diff-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .diff-btn { padding: 8px 15px; border-radius: 10px; background: transparent; color: white; border: 1px solid var(--accent); cursor: pointer; }
+        .diff-btn.active { background: var(--accent); }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; margin-bottom: 30px; }
+        .ttt-cell { 
             width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; transition: background 0.2s, transform 0.2s; border-radius: 16px;
+            font-size: 45px; font-weight: bold; cursor: pointer; transition: 0.2s;
         }
-        .cell:hover { background: var(--glass-hover); }
-        .cell:active { transform: scale(0.92); }
-        .cell svg { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .ttt-cell.x { color: var(--accent); }
+        .ttt-cell.o { color: #4dabf7; }
 
-        /* =========================================
-           [5. FLAPPY HEART STYLES]
-           ========================================= */
-        #flappy-container { width: 320px; height: 480px; position: relative; overflow: hidden; border-radius: 24px; cursor: pointer; }
-        #flappy-bird { width: 34px; height: 34px; position: absolute; left: 50px; top: 220px; z-index: 5; transition: transform 0.1s; fill: var(--accent); }
-        .pipe { position: absolute; width: 60px; background: rgba(255, 255, 255, 0.1); border: 2px solid var(--glass-border); border-radius: 8px; z-index: 4; }
-        #flappy-score-display { position: absolute; top: 20px; width: 100%; text-align: center; font-size: 40px; font-weight: bold; color: rgba(255,255,255,0.8); z-index: 6; text-shadow: 0 4px 10px rgba(0,0,0,0.5); pointer-events: none; }
-        .flappy-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .flappy-overlay.active { opacity: 1; pointer-events: auto; }
+        /* Match 3 */
+        #match3-board { display: grid; gap: 5px; background: var(--glass); padding: 10px; border-radius: 15px; }
+        .gem { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; border-radius: 10px; transition: 0.2s; }
+        .gem.selected { transform: scale(1.1); box-shadow: 0 0 15px var(--accent); background: rgba(255,255,255,0.2); }
+        
+        /* Game Canvas Containers (Helix & Flappy) */
+        .canvas-container { width: 100%; height: 60vh; position: relative; margin-top: 50px; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; border-radius: 20px; }
+        .score-display { position: absolute; top: 10px; right: 20px; font-size: 24px; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 10; }
+        
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 20; border-radius: 20px; }
+        .overlay.active { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
+    <div id="intro-screen">
+        <div class="heart-loader">💖</div>
+        <h2 style="color: white; font-weight: normal;">Для моєї Манюньки...</h2>
+    </div>
 
-    <!-- [APP CONTAINER] -->
-    <div id="app" style="width: 100%; max-width: 450px; height: 100%; position: relative;">
-        
-        <!-- ================= MAIN MENU ================= -->
-        <div id="screen-menu" class="screen active">
-            <h1 style="margin-bottom: 10px; font-size: 2.5rem; letter-spacing: 1px;">Arcade Hub</h1>
-            <div class="stats-panel">
-                <div>TTT Перемог: <span id="stat-ttt-wins">0</span></div>
-                <div>Flappy Рекорд: <span id="stat-flappy-high">0</span></div>
-            </div>
-            <button class="btn glass" onclick="App.switchScreen('ttt')">Хрестики vs Робот 🏹</button>
-            <button class="btn glass" onclick="App.switchScreen('flappy')">Flappy Heart 💖</button>
+    <div id="app">
+        <div id="screen-menu" class="screen">
+            <h1>Ігрова Кімната</h1>
+            <p style="margin-bottom: 20px; color: #aaa;">Обери гру, щоб розважитись!</p>
+            <button class="btn" onclick="App.open('flappy')">🕊️ Flappy Heart 💖</button>
+            <button class="btn" onclick="App.open('helix')">🌀 Спіраль (Helix) 🌀</button>
+            <button class="btn" onclick="App.open('match3')">💎 Три в ряд 🍬</button>
+            <button class="btn" onclick="App.open('ttt')">❌ Хрестики-Нулики ⭕</button>
         </div>
 
-        <!-- ================= TIC TAC TOE ================= -->
         <div id="screen-ttt" class="screen">
-            <div class="glass ttt-wrapper">
-                <h2 id="ttt-status" style="margin-bottom: 20px; font-weight: 400;">Твій хід 💖</h2>
-                <div id="ttt-grid" class="grid"></div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn" onclick="TTT.init()">Заново</button>
-                    <button class="btn" onclick="App.switchScreen('menu')">В меню</button>
-                </div>
+            <h2>Хрестики-Нулики</h2>
+            <div class="diff-selector">
+                <button class="diff-btn active" onclick="TTT.setDiff(1, this)">Легко</button>
+                <button class="diff-btn" onclick="TTT.setDiff(2, this)">Середньо</button>
+                <button class="diff-btn" onclick="TTT.setDiff(3, this)">Неможливо</button>
             </div>
+            <div id="ttt-msg" style="margin-bottom: 15px; font-size: 18px; min-height: 20px;">Твій хід!</div>
+            <div id="ttt-grid" class="ttt-grid"></div>
+            <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
 
-        <!-- ================= FLAPPY HEART ================= -->
+        <div id="screen-match3" class="screen">
+            <h2 class="header">Збери пару!</h2>
+            <div id="match3-score" style="margin-bottom: 10px; font-size: 20px;">Рахунок: 0</div>
+            <div id="match3-board"></div>
+            <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
+        </div>
+
+        <div id="screen-helix" class="screen">
+            <h2 class="header">Стрибай!</h2>
+            <div class="canvas-container glass">
+                <div id="helix-score" class="score-display">0</div>
+                <canvas id="helix-canvas"></canvas>
+            </div>
+            <div style="margin-top: 15px; color: #aaa; font-size: 12px; text-align: center;">Тягни вліво/вправо, щоб крутити башню</div>
+            <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
+        </div>
+
         <div id="screen-flappy" class="screen">
-            <div id="flappy-container" class="glass" onmousedown="Flappy.jump()" ontouchstart="Flappy.jump()">
-                <div id="flappy-score-display">0</div>
-                <div id="flappy-bird">
-                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                </div>
-                <!-- Game Over Overlay -->
-                <div id="flappy-gameover" class="flappy-overlay">
-                    <h2 style="margin-bottom: 10px;">Гру закінчено!</h2>
-                    <p style="margin-bottom: 20px;">Рахунок: <span id="flappy-final-score" style="color:var(--accent); font-weight:bold;">0</span></p>
-                    <button class="btn glass" onclick="Flappy.start(event)">Грати ще</button>
-                    <button class="btn glass" onclick="App.switchScreen('menu')">В меню</button>
+            <h2 class="header">Лети!</h2>
+            <div class="canvas-container glass">
+                <div id="flappy-score" class="score-display">0</div>
+                <canvas id="flappy-canvas"></canvas>
+                <div id="flappy-overlay" class="overlay">
+                    <h2 style="margin-bottom: 10px;">Кінець гри!</h2>
+                    <button class="btn" style="width: auto; padding: 10px 20px; margin-bottom: 10px;" onclick="Flappy.start()">Грати ще</button>
                 </div>
             </div>
+            <div style="margin-top: 15px; color: #aaa; font-size: 12px; text-align: center;">Тапай по екрану, щоб серце летіло</div>
+            <button class="btn back-btn" onclick="App.open('menu')">В Меню</button>
         </div>
     </div>
 
     <script>
-        /** =========================================================
-         *  [CORE] ASSETS & UTILS
-         *  ========================================================= */
-        const ICONS = {
-            HEART: `<svg viewBox="0 0 24 24" width="45" height="45" fill="#ff4d6d"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
-            BOW: `<svg viewBox="0 0 24 24" width="45" height="45" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3l-6 6 6 6M9 9l6 6M3 12h18"/></svg>`
+        // --- ГОЛОВНИЙ КОНТРОЛЕР ---
+        const App = {
+            init() {
+                setTimeout(() => {
+                    document.getElementById('intro-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    this.open('menu');
+                }, 2000); 
+            },
+            open(id) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('screen-' + id).classList.add('active');
+                
+                Helix.stop();
+                Flappy.stop();
+
+                if (id === 'ttt') TTT.init();
+                if (id === 'match3') Match3.init();
+                if (id === 'helix') Helix.init();
+                if (id === 'flappy') Flappy.init();
+            }
         };
 
-        const Storage = {
-            get: (key, def) => parseInt(localStorage.getItem(key)) || def,
-            set: (key, val) => localStorage.setItem(key, val)
-        };
-
-        /** =========================================================
-         *  [SYSTEM] TIKTOK PARTICLES
-         *  ========================================================= */
-        class ParticleSystem {
-            constructor() {
-                document.addEventListener('mousedown', (e) => this.spawn(e.clientX, e.clientY));
-                document.addEventListener('touchstart', (e) => this.spawn(e.touches[0].clientX, e.touches[0].clientY));
-            }
-            spawn(x, y) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.innerHTML = ICONS.HEART;
-                p.style.left = `${x - 22}px`;
-                p.style.top = `${y - 22}px`;
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 1200);
-            }
-        }
-
-        /** =========================================================
-         *  [GAME 1] TIC TAC TOE (UNBEATABLE MINIMAX AI)
-         *  ========================================================= */
+        // --- ГРА 1: ХРЕСТИКИ-НУЛИКИ ---
         const TTT = {
-            board: Array(9).fill(null),
-            active: true,
-            player: 'H', bot: 'B',
-            
+            board: [], diff: 1, player: 'X', ai: 'O', gameOver: false,
             init() {
                 this.board = Array(9).fill(null);
-                this.active = true;
-                document.getElementById('ttt-status').innerText = "Твій хід 💖";
-                
+                this.gameOver = false;
+                document.getElementById('ttt-msg').innerText = "Твій хід (Х)!";
+                this.render();
+            },
+            setDiff(level, btn) {
+                this.diff = level;
+                document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.init();
+            },
+            render() {
                 const grid = document.getElementById('ttt-grid');
                 grid.innerHTML = '';
                 for(let i=0; i<9; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell glass';
+                    let cell = document.createElement('div');
+                    cell.className = 'ttt-cell glass';
+                    if (this.board[i]) {
+                        cell.innerText = this.board[i] === 'X' ? '💖' : '⭕';
+                        cell.classList.add(this.board[i].toLowerCase());
+                    }
                     cell.onclick = () => this.makeMove(i);
                     grid.appendChild(cell);
                 }
             },
-
-            makeMove(i) {
-                if(!this.active || this.board[i]) return;
-                
-                this.board[i] = this.player;
+            makeMove(idx) {
+                if (this.board[idx] || this.gameOver) return;
+                this.board[idx] = this.player;
                 this.render();
+                if (this.checkWin(this.player)) return this.end("Ти перемогла! 💖");
+                if (this.board.every(c => c)) return this.end("Нічия! 🤝");
                 
-                if(this.checkWin(this.board, this.player)) return this.endGame("Ти зламала матрицю! 💖 (Неможливо)", true);
-                if(this.isDraw(this.board)) return this.endGame("Нічия! Робот розумний 🤝", false);
-                
-                this.active = false;
-                document.getElementById('ttt-status').innerText = "Робот думає... 🏹";
-                
-                setTimeout(() => {
-                    let bestMove = this.minimax(this.board, this.bot).index;
-                    this.board[bestMove] = this.bot;
-                    this.render();
-                    
-                    if(this.checkWin(this.board, this.bot)) return this.endGame("Робот переміг! 🏹", false);
-                    if(this.isDraw(this.board)) return this.endGame("Нічия! 🤝", false);
-                    
-                    document.getElementById('ttt-status').innerText = "Твій хід 💖";
-                    this.active = true;
-                }, 500); // Штучна затримка для реалістичності
+                this.gameOver = true;
+                document.getElementById('ttt-msg').innerText = "Думаю...";
+                setTimeout(() => this.aiMove(), 500);
             },
+            aiMove() {
+                let move;
+                if (this.diff === 1) move = this.getRandomMove();
+                else if (this.diff === 2) move = Math.random() > 0.5 ? this.getBestMove() : this.getRandomMove();
+                else move = this.getBestMove();
 
-            // Алгоритм Minimax: прораховує всі можливі ходи
-            minimax(newBoard, player) {
-                let availSpots = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null);
+                this.board[move] = this.ai;
+                this.render();
+                if (this.checkWin(this.ai)) return this.end("Я переміг! 😈");
+                if (this.board.every(c => c)) return this.end("Нічия! 🤝");
                 
-                if (this.checkWin(newBoard, this.player)) return { score: -10 };
-                else if (this.checkWin(newBoard, this.bot)) return { score: 10 };
-                else if (availSpots.length === 0) return { score: 0 };
-
-                let moves = [];
-                for (let i = 0; i < availSpots.length; i++) {
-                    let move = {};
-                    move.index = availSpots[i];
-                    newBoard[availSpots[i]] = player;
-
-                    if (player === this.bot) {
-                        let result = this.minimax(newBoard, this.player);
-                        move.score = result.score;
-                    } else {
-                        let result = this.minimax(newBoard, this.bot);
-                        move.score = result.score;
+                this.gameOver = false;
+                document.getElementById('ttt-msg').innerText = "Твій хід!";
+            },
+            getRandomMove() {
+                let empty = this.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+                return empty[Math.floor(Math.random() * empty.length)];
+            },
+            getBestMove() {
+                let bestScore = -Infinity, move;
+                for(let i=0; i<9; i++) {
+                    if(!this.board[i]) {
+                        this.board[i] = this.ai;
+                        let score = this.minimax(this.board, 0, false);
+                        this.board[i] = null;
+                        if(score > bestScore) { bestScore = score; move = i; }
                     }
-
-                    newBoard[availSpots[i]] = null;
-                    moves.push(move);
                 }
-
-                let bestMove;
-                if (player === this.bot) {
-                    let bestScore = -10000;
-                    for (let i = 0; i < moves.length; i++) {
-                        if (moves[i].score > bestScore) {
-                            bestScore = moves[i].score;
-                            bestMove = i;
+                return move !== undefined ? move : this.getRandomMove();
+            },
+            minimax(board, depth, isMaximizing) {
+                if (this.checkWin(this.ai)) return 10 - depth;
+                if (this.checkWin(this.player)) return depth - 10;
+                if (board.every(c => c)) return 0;
+                
+                if (isMaximizing) {
+                    let bestScore = -Infinity;
+                    for(let i=0; i<9; i++) {
+                        if(!board[i]) {
+                            board[i] = this.ai;
+                            bestScore = Math.max(bestScore, this.minimax(board, depth+1, false));
+                            board[i] = null;
                         }
                     }
+                    return bestScore;
                 } else {
-                    let bestScore = 10000;
-                    for (let i = 0; i < moves.length; i++) {
-                        if (moves[i].score < bestScore) {
-                            bestScore = moves[i].score;
-                            bestMove = i;
+                    let bestScore = Infinity;
+                    for(let i=0; i<9; i++) {
+                        if(!board[i]) {
+                            board[i] = this.player;
+                            bestScore = Math.min(bestScore, this.minimax(board, depth+1, true));
+                            board[i] = null;
+                        }
+                    }
+                    return bestScore;
+                }
+            },
+            checkWin(p) {
+                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                return wins.some(w => board = this.board[w[0]] === p && this.board[w[1]] === p && this.board[w[2]] === p);
+            },
+            end(msg) {
+                this.gameOver = true;
+                document.getElementById('ttt-msg').innerText = msg;
+                setTimeout(() => this.init(), 2000); 
+            }
+        };
+
+        // --- ГРА 2: ТРИ В РЯД ---
+        const Match3 = {
+            cols: 6, rows: 6, grid: [], score: 0,
+            emojis: ['💖', '🌸', '🎀', '🍬', '💎', '🍓'],
+            selected: null,
+            init() {
+                this.score = 0;
+                this.updateScore();
+                const board = document.getElementById('match3-board');
+                board.style.gridTemplateColumns = `repeat(${this.cols}, 45px)`;
+                this.grid = [];
+                for(let r=0; r<this.rows; r++) {
+                    this.grid[r] = [];
+                    for(let c=0; c<this.cols; c++) {
+                        this.grid[r][c] = this.randomGem();
+                    }
+                }
+                this.render();
+                this.checkMatches(); 
+            },
+            randomGem() { return this.emojis[Math.floor(Math.random() * this.emojis.length)]; },
+            render() {
+                const board = document.getElementById('match3-board');
+                board.innerHTML = '';
+                for(let r=0; r<this.rows; r++) {
+                    for(let c=0; c<this.cols; c++) {
+                        let cell = document.createElement('div');
+                        cell.className = 'gem';
+                        cell.innerText = this.grid[r][c];
+                        if(this.selected && this.selected.r === r && this.selected.c === c) cell.classList.add('selected');
+                        cell.onclick = () => this.clickGem(r, c);
+                        board.appendChild(cell);
+                    }
+                }
+            },
+            clickGem(r, c) {
+                if (!this.selected) {
+                    this.selected = {r, c};
+                    this.render();
+                } else {
+                    let dr = Math.abs(this.selected.r - r);
+                    let dc = Math.abs(this.selected.c - c);
+                    if ((dr === 1 && dc === 0) || (dr === 0 && dc === 1)) {
+                        let temp = this.grid[r][c];
+                        this.grid[r][c] = this.grid[this.selected.r][this.selected.c];
+                        this.grid[this.selected.r][this.selected.c] = temp;
+                        
+                        let matches = this.findMatches();
+                        if (matches.length > 0) {
+                            this.selected = null;
+                            this.processMatches(matches);
+                        } else {
+                            let temp2 = this.grid[r][c];
+                            this.grid[r][c] = this.grid[this.selected.r][this.selected.c];
+                            this.grid[this.selected.r][this.selected.c] = temp2;
+                            this.selected = null;
+                            this.render();
+                        }
+                    } else {
+                        this.selected = {r, c};
+                        this.render();
+                    }
+                }
+            },
+            findMatches() {
+                let matches = [];
+                for(let r=0; r<this.rows; r++) {
+                    for(let c=0; c<this.cols-2; c++) {
+                        if(this.grid[r][c] === this.grid[r][c+1] && this.grid[r][c] === this.grid[r][c+2]) {
+                            matches.push({r,c}, {r,c:c+1}, {r,c:c+2});
                         }
                     }
                 }
-                return moves[bestMove];
+                for(let c=0; c<this.cols; c++) {
+                    for(let r=0; r<this.rows-2; r++) {
+                        if(this.grid[r][c] === this.grid[r+1][c] && this.grid[r][c] === this.grid[r+2][c]) {
+                            matches.push({r,c}, {r:r+1,c}, {r:r+2,c});
+                        }
+                    }
+                }
+                return matches;
             },
-
-            checkWin(board, p) {
-                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-                return wins.some(c => c.every(i => board[i] === p));
-            },
-            
-            isDraw(board) { return !board.includes(null); },
-
-            render() {
-                const cells = document.querySelectorAll('#ttt-grid .cell');
-                this.board.forEach((val, i) => {
-                    if(val && !cells[i].innerHTML) {
-                        cells[i].innerHTML = val === 'H' ? ICONS.HEART : ICONS.BOW;
+            processMatches(matches) {
+                matches.forEach(m => {
+                    if(this.grid[m.r][m.c] !== null) {
+                        this.grid[m.r][m.c] = null;
+                        this.score += 10;
                     }
                 });
+                this.updateScore();
+                this.render();
+                
+                setTimeout(() => this.applyGravity(), 300);
             },
-
-            endGame(msg, isWin) {
-                this.active = false;
-                document.getElementById('ttt-status').innerText = msg;
-                if(isWin) {
-                    let wins = Storage.get('tttWins', 0) + 1;
-                    Storage.set('tttWins', wins);
-                    App.updateStats();
+            applyGravity() {
+                for(let c=0; c<this.cols; c++) {
+                    for(let r=this.rows-1; r>=0; r--) {
+                        if(this.grid[r][c] === null) {
+                            for(let k=r-1; k>=0; k--) {
+                                if(this.grid[k][c] !== null) {
+                                    this.grid[r][c] = this.grid[k][c];
+                                    this.grid[k][c] = null;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+                for(let c=0; c<this.cols; c++) {
+                    for(let r=0; r<this.rows; r++) {
+                        if(this.grid[r][c] === null) this.grid[r][c] = this.randomGem();
+                    }
+                }
+                this.render();
+                this.checkMatches();
+            },
+            checkMatches() {
+                let matches = this.findMatches();
+                if(matches.length > 0) setTimeout(() => this.processMatches(matches), 400);
+            },
+            updateScore() { document.getElementById('match3-score').innerText = `Рахунок: ${this.score}`; }
         };
 
-        /** =========================================================
-         *  [GAME 2] FLAPPY HEART (FULL PHYSICS ENGINE)
-         *  ========================================================= */
-        const Flappy = {
-            bird: null, container: null, overlay: null,
-            birdY: 220, velocity: 0, gravity: 0.5, jumpStrength: -7,
-            pipes: [], frames: 0, score: 0, gameActive: false, animationId: null,
-            pipeSpeed: 3, pipeGap: 140, pipeWidth: 60,
-
+        // --- ГРА 3: HELIX JUMP (З Сердечком) ---
+        const Helix = {
+            canvas: null, ctx: null, raf: null,
+            w: 0, h: 0,
+            rotation: 0, targetRotation: 0,
+            ball: { y: 50, vy: 0, radius: 12 }, 
+            platforms: [], score: 0, state: 'play',
+            isDragging: false, lastX: 0,
+            
             init() {
-                this.bird = document.getElementById('flappy-bird');
-                this.container = document.getElementById('flappy-container');
-                this.overlay = document.getElementById('flappy-gameover');
-                this.resetState();
-            },
-
-            resetState() {
-                this.birdY = 220;
-                this.velocity = 0;
-                this.pipes.forEach(p => p.top.remove() || p.bottom.remove());
-                this.pipes = [];
-                this.frames = 0;
+                this.canvas = document.getElementById('helix-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                let rect = this.canvas.parentElement.getBoundingClientRect();
+                this.w = this.canvas.width = rect.width;
+                this.h = this.canvas.height = rect.height;
+                
                 this.score = 0;
-                this.updateScore(0);
-                this.bird.style.top = this.birdY + 'px';
-                this.bird.style.transform = 'rotate(0deg)';
-                this.overlay.classList.remove('active');
-            },
-
-            start(e) {
-                if(e) e.stopPropagation(); // Запобігаємо стрибку при кліку на кнопку
-                this.resetState();
-                this.gameActive = true;
+                this.rotation = 0;
+                this.targetRotation = 0;
+                this.ball = { y: 50, vy: 0, radius: 12 };
+                this.state = 'play';
+                
+                this.generatePlatforms();
+                
+                this.canvas.onpointerdown = (e) => { this.isDragging = true; this.lastX = e.clientX; };
+                this.canvas.onpointermove = (e) => {
+                    if(!this.isDragging || this.state !== 'play') return;
+                    let dx = e.clientX - this.lastX;
+                    this.targetRotation += dx * 0.02;
+                    this.lastX = e.clientX;
+                };
+                this.canvas.onpointerup = () => { this.isDragging = false; };
+                this.canvas.onpointerleave = () => { this.isDragging = false; };
+                
+                document.getElementById('helix-score').innerText = this.score;
                 this.loop();
             },
-
-            jump() {
-                if(!this.gameActive) {
-                    if(!this.overlay.classList.contains('active')) this.start();
-                    return;
+            stop() { if(this.raf) cancelAnimationFrame(this.raf); this.state = 'stopped'; },
+            generatePlatforms() {
+                this.platforms = [];
+                for(let i=0; i<15; i++) {
+                    let gapStart = Math.random() * Math.PI * 2;
+                    let gapSize = Math.PI / 2.2; 
+                    this.platforms.push({
+                        y: 150 + i * 120,
+                        gapStart: gapStart,
+                        gapEnd: gapStart + gapSize,
+                        passed: false,
+                        color: i % 4 === 0 ? '#ff4d6d' : '#ffffff' 
+                    });
                 }
-                this.velocity = this.jumpStrength;
             },
-
             loop() {
-                if(!this.gameActive) return;
+                if (this.state !== 'play') return;
+                this.update();
+                this.draw();
+                this.raf = requestAnimationFrame(() => this.loop());
+            },
+            update() {
+                this.rotation += (this.targetRotation - this.rotation) * 0.2;
                 
-                // Physics
-                this.velocity += this.gravity;
-                this.birdY += this.velocity;
-                this.bird.style.top = this.birdY + 'px';
+                this.ball.vy += 0.4; // гравітація
+                this.ball.y += this.ball.vy;
                 
-                // Rotation based on velocity
-                let rotation = Math.min(Math.max(this.velocity * 4, -20), 70);
-                this.bird.style.transform = `rotate(${rotation}deg)`;
-
-                // Boundaries
-                if(this.birdY < 0 || this.birdY > 446) return this.gameOver();
-
-                // Pipe Generation
-                if(this.frames % 90 === 0) this.spawnPipe();
-
-                // Pipe Movement & Collision
-                for(let i = this.pipes.length - 1; i >= 0; i--) {
-                    let p = this.pipes[i];
-                    p.x -= this.pipeSpeed;
-                    p.top.style.left = p.x + 'px';
-                    p.bottom.style.left = p.x + 'px';
-
-                    // Collision Detection (AABB)
-                    let birdRect = { top: this.birdY + 5, bottom: this.birdY + 29, left: 55, right: 79 };
-                    let topPipeRect = { top: 0, bottom: p.topHeight, left: p.x, right: p.x + this.pipeWidth };
-                    let botPipeRect = { top: 480 - p.bottomHeight, bottom: 480, left: p.x, right: p.x + this.pipeWidth };
-
-                    if (this.isCollide(birdRect, topPipeRect) || this.isCollide(birdRect, botPipeRect)) {
-                        return this.gameOver();
-                    }
-
-                    // Score Update
-                    if(p.x === 47) {
-                        this.score++;
-                        this.updateScore(this.score);
-                    }
-
-                    // Remove off-screen pipes
-                    if(p.x < -this.pipeWidth) {
-                        p.top.remove(); p.bottom.remove();
-                        this.pipes.splice(i, 1);
-                    }
+                if(this.ball.y > this.h / 2.5) {
+                    let diff = this.ball.y - this.h / 2.5;
+                    this.ball.y = this.h / 2.5;
+                    this.platforms.forEach(p => p.y -= diff);
                 }
 
-                this.frames++;
-                this.animationId = requestAnimationFrame(() => this.loop());
-            },
+                for(let i=0; i<this.platforms.length; i++) {
+                    let p = this.platforms[i];
+                    if(this.ball.y + this.ball.radius >= p.y && this.ball.y - this.ball.vy < p.y) {
+                        
+                        let ballAngle = (-this.rotation % (Math.PI * 2));
+                        if(ballAngle < 0) ballAngle += Math.PI * 2;
+                        
+                        let inGap = false;
+                        let gs = p.gapStart, ge = p.gapEnd;
+                        
+                        if(ge > Math.PI*2) inGap = (ballAngle > gs || ballAngle < (ge - Math.PI*2));
+                        else inGap = (ballAngle > gs && ballAngle < ge);
 
-            isCollide(r1, r2) {
-                return !(r2.left > r1.right || r2.right < r1.left || r2.top > r1.bottom || r2.bottom < r1.top);
-            },
-
-            spawnPipe() {
-                let minPipeHeight = 50;
-                let maxPipeHeight = 480 - this.pipeGap - minPipeHeight;
-                let topHeight = Math.floor(Math.random() * (maxPipeHeight - minPipeHeight + 1) + minPipeHeight);
-                let bottomHeight = 480 - topHeight - this.pipeGap;
-
-                let topEl = document.createElement('div');
-                topEl.className = 'pipe';
-                topEl.style.height = topHeight + 'px';
-                topEl.style.top = '0';
-                topEl.style.left = '320px';
-
-                let bottomEl = document.createElement('div');
-                bottomEl.className = 'pipe';
-                bottomEl.style.height = bottomHeight + 'px';
-                bottomEl.style.bottom = '0';
-                bottomEl.style.left = '320px';
-
-                this.container.appendChild(topEl);
-                this.container.appendChild(bottomEl);
-
-                this.pipes.push({ x: 320, top: topEl, bottom: bottomEl, topHeight: topHeight, bottomHeight: bottomHeight });
-            },
-
-            updateScore(val) {
-                document.getElementById('flappy-score-display').innerText = val;
-            },
-
-            gameOver() {
-                this.gameActive = false;
-                cancelAnimationFrame(this.animationId);
-                
-                let high = Storage.get('flappyHigh', 0);
-                if(this.score > high) {
-                    Storage.set('flappyHigh', this.score);
-                    App.updateStats();
+                        if(inGap) {
+                            if(!p.passed) { p.passed = true; this.score++; document.getElementById('helix-score').innerText = this.score; }
+                        } else {
+                            this.ball.y = p.y - this.ball.radius;
+                            this.ball.vy = -7.5; // відскок
+                        }
+                    }
                 }
                 
-                document.getElementById('flappy-final-score').innerText = this.score;
-                this.overlay.classList.add('active');
+                if(this.platforms[0] && this.platforms[0].y < -50) {
+                    this.platforms.shift();
+                    let lastY = this.platforms[this.platforms.length-1].y;
+                    let gapStart = Math.random() * Math.PI * 2;
+                    this.platforms.push({
+                        y: lastY + 120, gapStart: gapStart, gapEnd: gapStart + Math.PI / 2.2, passed: false, color: Math.random() > 0.7 ? '#ff4d6d' : '#ffffff'
+                    });
+                }
+            },
+            draw() {
+                this.ctx.clearRect(0,0,this.w,this.h);
+                
+                this.ctx.fillStyle = '#222';
+                this.ctx.fillRect(this.w/2 - 15, 0, 30, this.h);
+
+                for(let i=0; i<this.platforms.length; i++) {
+                    let p = this.platforms[i];
+                    if(p.y < 0 || p.y > this.h + 50) continue;
+
+                    this.ctx.save();
+                    this.ctx.translate(this.w/2, p.y);
+                    this.ctx.rotate(this.rotation);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(0, 0, 70, p.gapEnd, p.gapStart + Math.PI*2);
+                    this.ctx.lineTo(0,0);
+                    this.ctx.fillStyle = p.color === '#ff4d6d' ? 'rgba(255, 77, 109, 0.8)' : 'rgba(255,255,255,0.8)';
+                    this.ctx.fill();
+                    
+                    this.ctx.lineWidth = 3;
+                    this.ctx.strokeStyle = p.color === '#ff4d6d' ? '#c92a47' : '#cccccc';
+                    this.ctx.stroke();
+                    this.ctx.restore();
+                }
+
+                // Малюємо Сердечко замість шарика
+                let bx = this.w/2;
+                let by = this.ball.y - Math.sin(this.rotation)*10;
+                
+                this.ctx.font = "28px Arial";
+                this.ctx.textAlign = "center";
+                this.ctx.textBaseline = "middle";
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = '#ff4d6d';
+                this.ctx.fillText("💖", bx, by);
+                this.ctx.shadowBlur = 0;
             }
         };
 
-        /** =========================================================
-         *  [APP HUB] CONTROLLER
-         *  ========================================================= */
-        const App = {
-            particles: new ParticleSystem(),
-            
+        // --- ГРА 4: FLAPPY HEART ---
+        const Flappy = {
+            canvas: null, ctx: null, raf: null,
+            w: 0, h: 0,
+            bird: { x: 50, y: 0, vy: 0, radius: 15 },
+            pipes: [], score: 0, frames: 0, state: 'stopped',
+
             init() {
-                this.updateStats();
-                TTT.init();
-                Flappy.init();
-            },
-            
-            updateStats() {
-                document.getElementById('stat-ttt-wins').innerText = Storage.get('tttWins', 0);
-                document.getElementById('stat-flappy-high').innerText = Storage.get('flappyHigh', 0);
-            },
-            
-            switchScreen(screenId) {
-                // Зупиняємо Flappy якщо виходимо
-                if(screenId !== 'flappy' && Flappy.gameActive) Flappy.gameOver();
+                this.canvas = document.getElementById('flappy-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                let rect = this.canvas.parentElement.getBoundingClientRect();
+                this.w = this.canvas.width = rect.width;
+                this.h = this.canvas.height = rect.height;
                 
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('screen-' + screenId).classList.add('active');
+                document.getElementById('flappy-overlay').classList.remove('active');
                 
-                if(screenId === 'ttt') TTT.init();
-                if(screenId === 'flappy') Flappy.init();
+                this.canvas.onpointerdown = () => this.jump();
+                this.start();
+            },
+            start() {
+                document.getElementById('flappy-overlay').classList.remove('active');
+                this.bird = { x: this.w * 0.3, y: this.h / 2, vy: 0, radius: 15 };
+                this.pipes = [];
+                this.score = 0;
+                this.frames = 0;
+                this.state = 'play';
+                document.getElementById('flappy-score').innerText = this.score;
+                this.loop();
+            },
+            stop() { if(this.raf) cancelAnimationFrame(this.raf); this.state = 'stopped'; },
+            jump() {
+                if (this.state === 'play') this.bird.vy = -7;
+            },
+            loop() {
+                if (this.state !== 'play') return;
+                this.update();
+                this.draw();
+                this.raf = requestAnimationFrame(() => this.loop());
+            },
+            update() {
+                this.frames++;
+                this.bird.vy += 0.4; // гравітація
+                this.bird.y += this.bird.vy;
+
+                // Генерація труб
+                if (this.frames % 90 === 0) {
+                    let gap = 160; // розмір дірки
+                    let topH = Math.random() * (this.h - gap - 60) + 30;
+                    this.pipes.push({ x: this.w, w: 50, topHeight: topH, gap: gap, passed: false });
+                }
+
+                // Логіка труб та зіткнень
+                for (let i = 0; i < this.pipes.length; i++) {
+                    let p = this.pipes[i];
+                    p.x -= 3; // швидкість руху
+
+                    // Зіткнення (AABB)
+                    if (this.bird.x + this.bird.radius > p.x && this.bird.x - this.bird.radius < p.x + p.w) {
+                        if (this.bird.y - this.bird.radius < p.topHeight || this.bird.y + this.bird.radius > p.topHeight + p.gap) {
+                            this.gameOver();
+                        }
+                    }
+
+                    // Рахунок
+                    if (p.x + p.w < this.bird.x && !p.passed) {
+                        p.passed = true;
+                        this.score++;
+                        document.getElementById('flappy-score').innerText = this.score;
+                    }
+                }
+
+                // Видалення старих труб
+                if (this.pipes.length > 0 && this.pipes[0].x < -60) {
+                    this.pipes.shift();
+                }
+
+                // Зіткнення з підлогою/стелею
+                if (this.bird.y > this.h || this.bird.y < 0) {
+                    this.gameOver();
+                }
+            },
+            draw() {
+                this.ctx.clearRect(0,0,this.w,this.h);
+
+                // Труби (Glass стиль)
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.lineWidth = 2;
+
+                for (let i = 0; i < this.pipes.length; i++) {
+                    let p = this.pipes[i];
+                    // Верхня
+                    this.ctx.fillRect(p.x, 0, p.w, p.topHeight);
+                    this.ctx.strokeRect(p.x, 0, p.w, p.topHeight);
+                    // Нижня
+                    this.ctx.fillRect(p.x, p.topHeight + p.gap, p.w, this.h - (p.topHeight + p.gap));
+                    this.ctx.strokeRect(p.x, p.topHeight + p.gap, p.w, this.h - (p.topHeight + p.gap));
+                }
+
+                // Малюємо Серце замість пташки
+                this.ctx.save();
+                this.ctx.translate(this.bird.x, this.bird.y);
+                // Повертаємо серце залежно від швидкості (як у Flappy Bird)
+                let angle = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (this.bird.vy * 0.1)));
+                this.ctx.rotate(angle);
+                
+                this.ctx.font = "30px Arial";
+                this.ctx.textAlign = "center";
+                this.ctx.textBaseline = "middle";
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = '#ff4d6d';
+                this.ctx.fillText("💖", 0, 0);
+                this.ctx.restore();
+            },
+            gameOver() {
+                this.state = 'stopped';
+                document.getElementById('flappy-overlay').classList.add('active');
             }
         };
 
-        // Запуск додатку після завантаження сторінки
+        // Запуск
         window.onload = () => App.init();
     </script>
 </body>
